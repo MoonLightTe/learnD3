@@ -1,0 +1,13 @@
+{
+  "name": "learnD3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "srcstart": "pnpm --filter @learnD3/src run dev"
+  },
+  "keywords": [],
+  "author": "yueX",
+  "license": "ISC",
+  "packageManager": "pnpm@10.9.0"
+}
