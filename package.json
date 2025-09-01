@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "srcstart": "pnpm --filter @learnD3/src run dev"
+    "srcstart": "pnpm --filter @learnD3/src run dev",
+    "domainStart": "pnpm --filter @learnD3/domain run dev"
   },
   "keywords": [],
   "author": "yueX",
