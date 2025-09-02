@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 
 export const timeNumber = [2, 6, 10, 14, 18, 22];
+export const dayNumber = 7;
+export const colCount = timeNumber.length * dayNumber
 export const nightTime = [2, 18, 22]; //夜间红色高亮时间
 export const leftTEXT = [
   ["脉搏,(次/分)", "160", "140", "120", "100", "80", "60", "40"],
