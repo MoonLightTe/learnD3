@@ -11,6 +11,8 @@ import {
   colCount,
   textLeftMargin,
   TEXT_MARGIN_BOTTOM,
+  TOP_KEYS,
+  LINE_HEIGHT,
 } from "../const/index";
 import ViewConfig from "./viewConfig";
 
@@ -140,6 +142,7 @@ function ConnectedScatterplot(options) {
   drawJuhua(svg, viewConfig.renderData.datasetHeartrate, viewConfig);
   thermometer(svg, viewConfig.renderData.earCool, viewConfig);
   drawBreathing(svg, viewConfig.renderData.datasetPain, viewConfig);
+  drawTopMask(svg, viewConfig);
   return svg.node();
 }
 
@@ -625,6 +628,42 @@ function drawBreathing(svg, breathData, viewConfig) {
     .attr("stroke-linejoin", viewConfig.strokeLinejoin)
     .attr("stroke-linecap", viewConfig.strokeLinecap);
 }
+
+function drawTopMask(svg, viewConfig) {
+  svg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${viewConfig.marginLeft},${HEAD_HEIGHT - LINE_HEIGHT})`
+    )
+    .append("rect")
+    .attr("class", "mask-rect")
+    .attr("x", 0)
+    .attr("y", -100)
+    .attr("width", viewConfig.contentWidth)
+    .attr("height", LINE_HEIGHT * (TOP_KEYS.length + 7.5) - 1)
+    .attr("stroke", viewConfig.stroke)
+    .attr("fill", "#fff")
+    .attr("style", "stroke-width: 0");
+  drawTopVerticalLine(svg, viewConfig);
+}
+
+function drawTopVerticalLine(svg, viewConfig) {
+  let start = viewConfig.step;
+  const lineG = getG(svg, viewConfig).append("g").attr("class", "topMaskLine");
+  while (start < viewConfig.contentWidth) {
+    lineG
+      .append("line")
+      .attr("fill", "stroke")
+      .attr("x1", start)
+      .attr("y1", 0)
+      .attr("y2", (TOP_KEYS.length + 1) * LINE_HEIGHT)
+      .attr("x2", start)
+      .attr("stroke", start > viewConfig.step ? "red" : viewConfig.stroke);
+    start = start + viewConfig.step;
+  }
+}
+
 function setPointerEvent(g, pointerObj) {
   g.on("pointerenter", generatePointer(pointerObj))
     .on("pointerleave", pointerLeft(pointerObj.viewConfig))
