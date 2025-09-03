@@ -10,6 +10,7 @@ import {
   dayNumber,
   colCount,
   textLeftMargin,
+  TEXT_MARGIN_BOTTOM,
 } from "../const/index";
 import ViewConfig from "./viewConfig";
 
@@ -138,6 +139,7 @@ function ConnectedScatterplot(options) {
   drawAnus(svg, viewConfig.renderData.datasetAnus, viewConfig);
   drawJuhua(svg, viewConfig.renderData.datasetHeartrate, viewConfig);
   thermometer(svg, viewConfig.renderData.earCool, viewConfig);
+  drawBreathing(svg, viewConfig.renderData.datasetPain, viewConfig);
   return svg.node();
 }
 
@@ -337,6 +339,9 @@ function drwaPulse(svg, viewConfig) {
         if (i === 0) {
           return viewConfig.topKeysPos + viewConfig.micoStep * 1;
         }
+        if (i === texts.length - 1) {
+          return viewConfig.topKeysPos + viewConfig.micoStep * 5 * i;
+        }
         // 加5的目的是视觉看起来对齐
         return viewConfig.topKeysPos + viewConfig.micoStep * 5 * i + 5;
       });
@@ -345,7 +350,7 @@ function drwaPulse(svg, viewConfig) {
 function drawBgLine(svg, viewConfig) {
   const g = getG(svg, viewConfig);
   // 绘制横线
-  const horizontalLength = (bodyTemperature[1] - bodyTemperature[0]) * 5 + 1;
+  const horizontalLength = (bodyTemperature[1] - bodyTemperature[0] + 1) * 5;
   const horizontalData = [...new Array(horizontalLength).keys()];
   g.append("g")
     .attr("class", "line-content")
@@ -545,6 +550,80 @@ function thermometer(svg, pathData, viewConfig) {
     riangle: 24,
   };
   drawThreeIcon(iconObj);
+}
+
+function drawBreathing(svg, breathData, viewConfig) {
+  const g = getG(svg, viewConfig);
+  g.append("rect")
+    .attr("class", "mask-rect")
+    .attr("x", 1)
+    .attr("y", viewConfig.bottomKeysPosStart)
+    .attr("width", viewConfig.contentWidth - 2)
+    .attr("height", viewConfig.micoStep * 2 - 1)
+    .attr("stroke", viewConfig.stroke)
+    .attr("fill", "#fff")
+    .attr("style", "stroke-width: 0");
+  g.append("line")
+    .attr("x1", 0)
+    .attr("y1", viewConfig.bottomKeysPosStart)
+    .attr("x2", viewConfig.contentWidth)
+    .attr("y2", viewConfig.bottomKeysPosStart)
+    .attr("fill", "none")
+    .attr("class", "dataLine")
+    .attr("stroke", viewConfig.stroke)
+    .attr("stroke-width", 1)
+    .attr("stroke-linejoin", viewConfig.strokeLinejoin)
+    .attr("stroke-linecap", viewConfig.strokeLinecap);
+  const textYPos =
+    viewConfig.bottomKeysPosStart + viewConfig.micoStep + TEXT_MARGIN_BOTTOM;
+  g.append("text")
+    .attr("style", "font-size: 14px")
+    .text("呼吸(次/分)")
+    .attr("x", textLeftMargin)
+    .attr("y", textYPos);
+
+  const data = d3.range(colCount);
+  console.log("🚀 ~ drawBreathing ~ colCount:", colCount);
+  g.append("g")
+    .selectAll("text")
+    .data(data)
+    .join("text")
+    .attr("style", "font-size:14px")
+    .attr("class", "mytext")
+    .text((d) => {
+      console.log("🚀 ~ drawBreathing ~ d:", d);
+      return breathData[d]?.value;
+    })
+    .attr("x", (i) => {
+      return viewConfig.step + i * viewConfig.micoStep + 2;
+    })
+    .attr("y", (i) => {
+      if (i % 2) {
+        return textYPos + 10;
+      }
+      return textYPos - 10;
+    });
+
+  g.append("g")
+    .selectAll("line")
+    .data(data)
+    .join("line")
+    .attr("x1", (d, i) => {
+      return viewConfig.step + i * viewConfig.micoStep;
+    })
+    .attr("y1", (d, i) => viewConfig.bottomKeysPosStart)
+    .attr("x2", (d, i) => {
+      return viewConfig.step + i * viewConfig.micoStep;
+    })
+    .attr("y2", (d, i) => {
+      return viewConfig.bottomKeysPosStart + 2 * viewConfig.micoStep;
+    })
+    .attr("fill", "none")
+    .attr("class", "dataLine")
+    .attr("stroke", viewConfig.stroke)
+    .attr("stroke-width", 1)
+    .attr("stroke-linejoin", viewConfig.strokeLinejoin)
+    .attr("stroke-linecap", viewConfig.strokeLinecap);
 }
 function setPointerEvent(g, pointerObj) {
   g.on("pointerenter", generatePointer(pointerObj))
