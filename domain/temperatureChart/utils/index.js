@@ -13,6 +13,7 @@ import {
   TEXT_MARGIN_BOTTOM,
   TOP_KEYS,
   LINE_HEIGHT,
+  BOTTOM_KEYS,
 } from "../const/index";
 import ViewConfig from "./viewConfig";
 
@@ -143,6 +144,7 @@ function ConnectedScatterplot(options) {
   thermometer(svg, viewConfig.renderData.earCool, viewConfig);
   drawBreathing(svg, viewConfig.renderData.datasetPain, viewConfig);
   drawTopMask(svg, viewConfig);
+  drawBottomMask(svg, viewConfig);
   return svg.node();
 }
 
@@ -576,7 +578,9 @@ function drawBreathing(svg, breathData, viewConfig) {
     .attr("stroke", viewConfig.stroke)
     .attr("stroke-width", 1)
     .attr("stroke-linejoin", viewConfig.strokeLinejoin)
-    .attr("stroke-linecap", viewConfig.strokeLinecap);
+    .attr("stroke-linecap", viewConfig.strokeLinecap)
+    // .attr("visibility", (d, i) => (i % 6 !== 0 ? "visible" : "hidden")); // 6可以抽离出来
+
   const textYPos =
     viewConfig.bottomKeysPosStart + viewConfig.micoStep + TEXT_MARGIN_BOTTOM;
   g.append("text")
@@ -586,7 +590,6 @@ function drawBreathing(svg, breathData, viewConfig) {
     .attr("y", textYPos);
 
   const data = d3.range(colCount);
-  console.log("🚀 ~ drawBreathing ~ colCount:", colCount);
   g.append("g")
     .selectAll("text")
     .data(data)
@@ -594,7 +597,6 @@ function drawBreathing(svg, breathData, viewConfig) {
     .attr("style", "font-size:14px")
     .attr("class", "mytext")
     .text((d) => {
-      console.log("🚀 ~ drawBreathing ~ d:", d);
       return breathData[d]?.value;
     })
     .attr("x", (i) => {
@@ -626,7 +628,9 @@ function drawBreathing(svg, breathData, viewConfig) {
     .attr("stroke", viewConfig.stroke)
     .attr("stroke-width", 1)
     .attr("stroke-linejoin", viewConfig.strokeLinejoin)
-    .attr("stroke-linecap", viewConfig.strokeLinecap);
+    .attr("stroke-linecap", viewConfig.strokeLinecap)
+    .attr("visibility", (d, i) => (i % 6 !== 0 ? "visible" : "hidden")); // 6可以抽离出来
+
 }
 
 function drawTopMask(svg, viewConfig) {
@@ -648,6 +652,34 @@ function drawTopMask(svg, viewConfig) {
   drawTopVerticalLine(svg, viewConfig);
 }
 
+function drawBottomMask(svg, viewConfig) {
+  const g = getG(svg, viewConfig);
+  g.append("rect")
+    .attr("x", 0)
+    .attr("y", viewConfig.bottomKeysPosStart + viewConfig.micoStep * 2)
+    .attr("width", viewConfig.contentWidth)
+    .attr("height", LINE_HEIGHT * (BOTTOM_KEYS.length + 5))
+    .attr("stroke", viewConfig.stroke)
+    .attr("fill", "#fff")
+    .attr("style", "stroke-width: 0");
+  drawBottomMaskLine(svg, viewConfig);
+}
+
+function drawBottomMaskLine(svg, viewConfig) {
+  let start = 0;
+  const lineG = getG(svg, viewConfig).append("g").attr("class", "topMaskLine");
+  while (start < viewConfig.contentWidth) {
+    lineG
+      .append("line")
+      .attr("fill", "stroke")
+      .attr("x1", start)
+      .attr("y1", viewConfig.bottomKeysPosStart)
+      .attr("y2", viewConfig.tableHeight)
+      .attr("x2", start)
+      .attr("stroke", start > viewConfig.step ? "red" : viewConfig.stroke);
+    start = start + viewConfig.step;
+  }
+}
 function drawTopVerticalLine(svg, viewConfig) {
   let start = viewConfig.step;
   const lineG = getG(svg, viewConfig).append("g").attr("class", "topMaskLine");

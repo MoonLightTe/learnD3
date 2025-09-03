@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 
 export const timeNumber = [2, 6, 10, 14, 18, 22];
 export const dayNumber = 7;
-export const colCount = timeNumber.length * dayNumber
+export const colCount = timeNumber.length * dayNumber;
 export const nightTime = [2, 18, 22]; //夜间红色高亮时间
 export const leftTEXT = [
   ["脉搏,(次/分)", "160", "140", "120", "100", "80", "60", "40"],
@@ -97,6 +97,45 @@ export const TOP_KEYS = [
       const { postpartum } = renderData.infoData;
       return postpartum[i];
     },
+  },
+];
+// 最底部的字段绘制
+export const BOTTOM_KEYS = [
+  {
+    name: "血压(mmHg)",
+    key: "008",
+  },
+  {
+    name: "体液入量(ml)",
+    key: "006",
+  },
+  {
+    name: "尿量(ml)",
+    key: "011",
+  },
+  {
+    name: "大便(次)",
+    key: "005",
+  },
+  {
+    name: "小便(次)",
+    key: "004",
+  },
+  {
+    name: "身高(cm)",
+    key: "030",
+  },
+  {
+    name: "体重(kg)",
+    key: "009",
+  },
+  {
+    name: "其他排出量(ml)",
+    key: "007",
+  },
+  {
+    name: "过敏药",
+    key: "010",
   },
 ];
 export const HEAD_HEIGHT = 100; // 头部文字预留位置
