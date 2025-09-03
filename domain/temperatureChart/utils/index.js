@@ -131,6 +131,13 @@ function ConnectedScatterplot(options) {
   viewConfig.renderData.datasetHeartRate.forEach((item) => {
     drawHeartRate(svg, item, viewConfig);
   });
+  console.log("renderData", viewConfig.renderData);
+  //口温icon
+  drawPathBody(svg, viewConfig.renderData.bodyData, viewConfig);
+  // 绘制ye
+  drawAnus(svg, viewConfig.renderData.datasetAnus, viewConfig);
+  drawJuhua(svg, viewConfig.renderData.datasetHeartrate, viewConfig);
+  thermometer(svg, viewConfig.renderData.earCool, viewConfig);
   return svg.node();
 }
 
@@ -425,7 +432,6 @@ function brokenLine(svg, pathData, viewConfig) {
   });
 }
 function drawHeartRate(svg, pathData, viewConfig) {
-  console.log("🚀 ~ drawHeartRate ~ pathData:", pathData);
   const indexList = d3.map(pathData, (_, i) => i);
   const g = getG(svg, viewConfig);
   const pointerObj = {
@@ -461,6 +467,91 @@ function drawHeartRate(svg, pathData, viewConfig) {
     stroke: "red",
   });
 }
+function drawPathBody(svg, pathData, viewConfig) {
+  const g = getG(svg, viewConfig);
+  const pointerObj = {
+    pathData,
+    type: "口温",
+    viewConfig,
+    yScaleInstance: viewConfig.bodyScale,
+  };
+  setPointerEvent(g, pointerObj);
+  let iconObj = {
+    content: g,
+    data: d3.range(pathData.length),
+    x: getXPostion(pathData, viewConfig),
+    y: getYPosition(pathData, viewConfig.bodyScale),
+    r: 3,
+  };
+  drawRoundIcon(iconObj);
+}
+function drawAnus(svg, pathData, viewConfig) {
+  const g = getG(svg, viewConfig);
+  const pointerObj = {
+    pathData,
+    type: "腋温",
+    viewConfig,
+    yScaleInstance: viewConfig.bodyScale,
+  };
+  setPointerEvent(g, pointerObj);
+  let iconObj = {
+    content: g,
+    data: d3.range(pathData.length),
+    x: getXPostion(pathData, viewConfig),
+    y: getYPosition(pathData, viewConfig.bodyScale),
+    r: 3,
+  };
+  drawRoundIcon(iconObj);
+}
+
+// 绘制肛温
+function drawJuhua(svg, pathData, viewConfig) {
+  const g = getG(svg, viewConfig);
+
+  const pointerObj = {
+    pathData,
+    type: "肛温",
+    viewConfig,
+    yScaleInstance: viewConfig.bodyScale,
+  };
+  setPointerEvent(g, pointerObj);
+  let iconObj = {
+    content: g,
+    data: d3.range(pathData.length),
+    x: getXPostion(pathData, viewConfig),
+    y: getYPosition(pathData, viewConfig.bodyScale),
+    fill: "white",
+    deepFill: "blue",
+    r: 3,
+  };
+
+  drawRoundDotIcon(iconObj);
+}
+
+function thermometer(svg, pathData, viewConfig) {
+  const g = getG(svg, viewConfig);
+  const pointerObj = {
+    pathData,
+    type: "耳温",
+    viewConfig,
+    yScaleInstance: viewConfig.bodyScale,
+  };
+  setPointerEvent(g, pointerObj);
+  let iconObj = {
+    content: g,
+    data: d3.range(pathData.length),
+    x: getXPostion(pathData, viewConfig),
+    y: getYPosition(pathData, viewConfig.bodyScale),
+    riangle: 24,
+  };
+  drawThreeIcon(iconObj);
+}
+function setPointerEvent(g, pointerObj) {
+  g.on("pointerenter", generatePointer(pointerObj))
+    .on("pointerleave", pointerLeft(pointerObj.viewConfig))
+    .on("pointermove", generatePointer(pointerObj));
+}
+
 function getDrawPath({ content, line, viewConfig, stroke = "blue" }) {
   content
     .append("path")
@@ -537,7 +628,7 @@ function getXPostion(data, viewConfig) {
 }
 
 function getYPosition(data, scale) {
-  return (i) => scale(data[i].value ? data[i].value : 0);
+  return (i) => (data[i].value ? scale(data[i].value) : 0);
 }
 
 function drawRoundIcon({
@@ -549,7 +640,6 @@ function drawRoundIcon({
   stroke = "blue",
   r = 5,
 }) {
-  console.log("🚀 ~ drawRoundIcon ~ content:", content);
   content
     .append("g")
     .attr("fill", fill)
@@ -560,7 +650,6 @@ function drawRoundIcon({
     .join("circle")
     .attr("transform", (i) => {
       const yValue = y(i) || 0;
-      console.log("🚀 ~ drawRoundIcon ~ yValue:", yValue);
       return !yValue ? "scale(0)" : "";
     })
     .attr("cx", x)
@@ -570,5 +659,66 @@ function drawRoundIcon({
         return r;
       }
       return 0;
+    });
+}
+
+function drawRoundDotIcon({
+  content,
+  data,
+  x,
+  y,
+  fill = "white",
+  stroke = "blue",
+  deepFill = "blue",
+  r = 6,
+}) {
+  content
+    .append("g")
+    .attr("fill", fill)
+    .attr("stroke", stroke)
+    .attr("stroke-width", 1)
+    .selectAll("circle")
+    .data(data)
+    .join("circle")
+    .attr("transform", (i) => {
+      const yValue = y(i) || 0;
+      return !yValue ? "scale(0)" : "";
+    })
+    .attr("cx", x)
+    .attr("cy", y)
+    .attr("r", r)
+    .clone()
+    .attr("cx", x)
+    .attr("cy", y)
+    .attr("r", 1)
+    .attr("fill", deepFill);
+}
+
+function drawThreeIcon({
+  content,
+  data,
+  x,
+  y,
+  fill = "blue",
+  stroke = "blue",
+  riangle = 48,
+}) {
+  //  const triangle = d3.symbol().type
+  content
+    .append("g")
+    .attr("class", "triangle")
+    .selectAll("g")
+    .data(data)
+    .join("g")
+    .attr("transform", (i) => {
+      const yValue = y(i) || 0;
+      return !yValue ? "scale(0)" : `translate(${x(i)},${yValue})`;
+    })
+    .append("path")
+    .call((path) => {
+      path
+        .attr("d", d3.symbol(d3.symbolTriangle, riangle))
+        .attr("fill", fill)
+        .attr("stroke", stroke);
     });
 }
