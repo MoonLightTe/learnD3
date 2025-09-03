@@ -145,6 +145,7 @@ function ConnectedScatterplot(options) {
   drawBreathing(svg, viewConfig.renderData.datasetPain, viewConfig);
   drawTopMask(svg, viewConfig);
   drawBottomMask(svg, viewConfig);
+  drawBottomLineData(svg, viewConfig);
   return svg.node();
 }
 
@@ -578,8 +579,8 @@ function drawBreathing(svg, breathData, viewConfig) {
     .attr("stroke", viewConfig.stroke)
     .attr("stroke-width", 1)
     .attr("stroke-linejoin", viewConfig.strokeLinejoin)
-    .attr("stroke-linecap", viewConfig.strokeLinecap)
-    // .attr("visibility", (d, i) => (i % 6 !== 0 ? "visible" : "hidden")); // 6可以抽离出来
+    .attr("stroke-linecap", viewConfig.strokeLinecap);
+  // .attr("visibility", (d, i) => (i % 6 !== 0 ? "visible" : "hidden")); // 6可以抽离出来
 
   const textYPos =
     viewConfig.bottomKeysPosStart + viewConfig.micoStep + TEXT_MARGIN_BOTTOM;
@@ -630,7 +631,6 @@ function drawBreathing(svg, breathData, viewConfig) {
     .attr("stroke-linejoin", viewConfig.strokeLinejoin)
     .attr("stroke-linecap", viewConfig.strokeLinecap)
     .attr("visibility", (d, i) => (i % 6 !== 0 ? "visible" : "hidden")); // 6可以抽离出来
-
 }
 
 function drawTopMask(svg, viewConfig) {
@@ -694,6 +694,52 @@ function drawTopVerticalLine(svg, viewConfig) {
       .attr("stroke", start > viewConfig.step ? "red" : viewConfig.stroke);
     start = start + viewConfig.step;
   }
+}
+
+function drawBottomLineData(svg, viewConfig) {
+  const g = getG(svg, viewConfig);
+  // 绘制竖线
+  g.selectAll("line")
+    .data([...BOTTOM_KEYS])
+    .join("line")
+    .attr("x1", 0)
+    .attr("y1", (d, i) => {
+      return viewConfig.bottomKeysPosStart + (i + 2) * LINE_HEIGHT;
+    })
+    .attr("x2", viewConfig.contentWidth)
+    .attr("y2", (d, i) => viewConfig.bottomKeysPosStart + (i + 2) * LINE_HEIGHT)
+    .attr("fill", "none")
+    .attr("class", "dataLine")
+    .attr("stroke", viewConfig.stroke)
+    .attr("stroke-width", 1)
+    .attr("stroke-linejoin", viewConfig.strokeLinejoin)
+    .attr("stroke-linecap", viewConfig.strokeLinecap);
+  const textArr = BOTTOM_KEYS;
+  const repeatArr = d3.range(8);
+  textArr.map(({ key, name }, index) => {
+    g.append("g")
+      .selectAll("text")
+      .data(repeatArr)
+      .join("text")
+      .attr("style", "font-size:14px")
+      .attr("class", "bottomText")
+      .text((i) => {
+        if (i == 0) {
+          return name;
+        } else {
+          return getTypeValue(key, viewConfig.renderData.typesData)[i - 1]
+            ?.typeValue;
+        }
+      })
+      .attr("x", (i) => viewConfig.step * i + textLeftMargin)
+      .attr("y", (i) => {
+        return (
+          viewConfig.bottomKeysPosStart +
+          (index + 3) * LINE_HEIGHT -
+          TEXT_MARGIN_BOTTOM
+        );
+      });
+  });
 }
 
 function setPointerEvent(g, pointerObj) {
@@ -871,4 +917,8 @@ function drawThreeIcon({
         .attr("fill", fill)
         .attr("stroke", stroke);
     });
+}
+
+function getTypeValue(type, allData = [], isNumber = true) {
+  return allData.filter((item) => item.typeCode == type || null);
 }
