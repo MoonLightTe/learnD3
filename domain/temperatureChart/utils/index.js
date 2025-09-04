@@ -149,6 +149,7 @@ function ConnectedScatterplot(options) {
   drawBottomLineData(svg, viewConfig);
   drawTopData(svg, viewConfig);
   drawSpecialText(svg, viewConfig.renderData.mergeTag, viewConfig);
+  console.log("🚀 ~ ConnectedScatterplot ~ viewConfig:", viewConfig.renderData);
   drawSpecialText(
     svg,
     viewConfig.renderData.symbolGoUp.filter((item) => !isNumeric(item.value)),
@@ -156,11 +157,67 @@ function ConnectedScatterplot(options) {
     viewConfig,
     true
   );
+  drawCoolBody(
+    svg,
+    viewConfig.renderData.dataCool,
+    viewConfig.renderData.allTemperatureData,
+    viewConfig
+  );
   return svg.node();
 }
 
-function drawCoolBody(svg, coolData){
-
+function drawCoolBody(svg, data, allData, viewConfig) {
+  const g = getG(svg, viewConfig);
+  // 获取同个位置记录的温度
+  const temArrMap = allData.reduce((data, items) => {
+    items.map((item) => {
+      if (item.value) {
+        data[item.index] = item.value;
+      }
+    });
+    return data;
+  }, {});
+  const vaildData = data.filter((item) => item.value);
+  vaildData.push({ index: 11, date: "2022-03-27", value: 39 });
+  console.log("🚀 ~ drawCoolBody ~ vaildData:", vaildData);
+  console.log("🚀 ~ drawCoolBody ~ temArrMap:", temArrMap);
+  const lineData = vaildData.filter(
+    ({ index, value }) => temArrMap[index] != value
+  );
+  console.log("🚀 ~ drawCoolBody ~ lineData:", lineData);
+  g.append("g")
+    .selectAll("line")
+    .data(lineData)
+    .join("line")
+    .attr("class", "xuxianliane")
+    .attr("x1", function ({ index }) {
+      return viewConfig.xScale(index) + viewConfig.X_OFFSET;
+    })
+    .attr("y1", function ({ value }) {
+      return viewConfig.bodyScale(value);
+    })
+    .attr("x2", function ({ index }) {
+      return viewConfig.xScale(index) + viewConfig.X_OFFSET;
+    })
+    .attr("y2", function ({ index }) {
+      const bodyValue = temArrMap[index];
+      // console.log(bodyValue, index, "bodyValue", bodyScale(bodyValue));
+      return viewConfig.bodyScale(bodyValue);
+    })
+    .attr("stroke", "red")
+    .attr("stroke-width", 2)
+    .style("stroke-dasharray", "3, 3")
+    .attr("stroke-linejoin", viewConfig.strokeLinejoin)
+    .attr("stroke-linecap", viewConfig.strokeLinecap);
+  drawRoundIcon({
+    content: g,
+    data: d3.range(vaildData.length),
+    x: getXPostion(vaildData, viewConfig),
+    y: getYPosition(vaildData, viewConfig.bodyScale),
+    fill: "transparent",
+    stroke: "red",
+    r: 6,
+  });
 }
 
 function getMaxList({
@@ -855,7 +912,7 @@ function drawTopData(svg, viewConfig) {
 }
 
 function drawSpecialText(svg, textData, viewConfig, isBottom = false) {
-  console.log("🚀 ~ drawSpecialText ~ textData:", textData)
+  console.log("🚀 ~ drawSpecialText ~ textData:", textData);
   const g = getG(svg, viewConfig);
   g.append("g")
     .selectAll("text")
