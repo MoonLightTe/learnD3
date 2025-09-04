@@ -91,13 +91,6 @@ export const TOP_KEYS = [
       return dateClosed.stopNumber ? hospDays + i + 1 : "";
     },
   },
-  {
-    name: "手术或产后日数",
-    getValue: (i, renderData) => {
-      const { postpartum } = renderData.infoData;
-      return postpartum[i];
-    },
-  },
 ];
 // 最底部的字段绘制
 export const BOTTOM_KEYS = [

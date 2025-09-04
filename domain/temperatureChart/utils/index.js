@@ -14,6 +14,7 @@ import {
   TOP_KEYS,
   LINE_HEIGHT,
   BOTTOM_KEYS,
+  nightTime,
 } from "../const/index";
 import ViewConfig from "./viewConfig";
 
@@ -146,7 +147,20 @@ function ConnectedScatterplot(options) {
   drawTopMask(svg, viewConfig);
   drawBottomMask(svg, viewConfig);
   drawBottomLineData(svg, viewConfig);
+  drawTopData(svg, viewConfig);
+  drawSpecialText(svg, viewConfig.renderData.mergeTag, viewConfig);
+  drawSpecialText(
+    svg,
+    viewConfig.renderData.symbolGoUp.filter((item) => !isNumeric(item.value)),
+    viewConfig,
+    viewConfig,
+    true
+  );
   return svg.node();
+}
+
+function drawCoolBody(svg, coolData){
+
 }
 
 function getMaxList({
@@ -198,6 +212,10 @@ function groupTemperatureData(datas) {
   const datasetPain = getTypeData("001", rowsData, false);
   console.log(datasetPain, "呼吸");
   const title = infoData.title;
+  infoData.dateClosed = {
+    stopTime: true, // 控制结束日期
+    stopNumber: true, // 控制住院天数
+  };
   return {
     title,
     datasetHeartRate: [datasetHeartRate],
@@ -740,6 +758,131 @@ function drawBottomLineData(svg, viewConfig) {
         );
       });
   });
+}
+
+function drawTopData(svg, viewConfig) {
+  const g = getG(svg, viewConfig);
+  g.selectAll("line")
+    .data(TOP_KEYS)
+    .join("line")
+    .attr("x1", 0)
+    .attr("y1", (d, i) => {
+      return LINE_HEIGHT * (i + 1);
+    })
+    .attr("y2", (d, i) => {
+      return LINE_HEIGHT * (i + 1);
+    })
+    .attr("x2", viewConfig.contentWidth)
+    .attr("fill", "none")
+    .attr("class", "newline")
+    .attr("stroke", viewConfig.stroke)
+    .attr("stroke-width", 1)
+    .attr("stroke-linejoin", viewConfig.strokeLinejoin)
+    .attr("stroke-linecap", viewConfig.strokeLinecap);
+  const repeatArr = d3.range(8);
+  TOP_KEYS.map(({ getValue, name }, index) => {
+    g.append("g")
+      .selectAll("text")
+      .data(repeatArr)
+      .join("text")
+      .attr("style", "font-size:14px;text-anchor:middle;")
+      .attr("class", "mytext")
+      .text((i) => {
+        if (i == 0) {
+          return name;
+        } else {
+          return getValue(i - 1, viewConfig.renderData);
+        }
+      })
+      .attr("x", (i) => i * viewConfig.step + viewConfig.step / 2)
+      .attr("y", () => {
+        return LINE_HEIGHT * (index + 1) - TEXT_MARGIN_BOTTOM;
+      });
+  });
+  g.append("text")
+    .attr("style", "font-size:14px;text-anchor:middle;")
+    .text("时 间")
+    .attr("x", viewConfig.step / 2)
+    .attr("y", viewConfig.topKeysPos - TEXT_MARGIN_BOTTOM);
+  // 绘制竖线和时间汉字
+  const data = new Array(timeNumber.length * 7)
+    .fill("")
+    .map((d, i) => timeNumber[i % timeNumber.length]);
+  g.append("g")
+    .selectAll("text")
+    .data(data)
+    .join("text")
+    .attr("style", "font-size:14px")
+    .attr("class", "mytext")
+    .attr("fill", (d) => {
+      if (nightTime.includes(d)) {
+        return "red";
+      } else {
+        return viewConfig.stroke;
+      }
+    })
+    .text((d) => {
+      return d;
+    })
+    .attr("x", (d, i) => {
+      return viewConfig.step + i * viewConfig.micoStep + 3;
+    })
+    .attr("y", (d, i) => {
+      return viewConfig.topKeysPos - TEXT_MARGIN_BOTTOM;
+    });
+
+  g.append("g")
+    .attr("class", "textYPos")
+    .selectAll("line")
+    .data(data)
+    .join("line")
+    .attr("x1", (d, i) => {
+      return viewConfig.step + i * viewConfig.micoStep;
+    })
+    .attr("y1", viewConfig.topKeysPos - LINE_HEIGHT)
+    .attr("x2", (d, i) => {
+      return viewConfig.step + i * viewConfig.micoStep;
+    })
+    .attr("y2", viewConfig.topKeysPos)
+    .attr("fill", "none")
+    .attr("class", "dataLine")
+    .attr("stroke", viewConfig.stroke)
+    .attr("stroke-width", (d, i) => {
+      return i % 6 ? 1 : 0;
+    })
+    .attr("stroke-linejoin", viewConfig.strokeLinejoin)
+    .attr("stroke-linecap", viewConfig.strokeLinecap);
+}
+
+function drawSpecialText(svg, textData, viewConfig, isBottom = false) {
+  console.log("🚀 ~ drawSpecialText ~ textData:", textData)
+  const g = getG(svg, viewConfig);
+  g.append("g")
+    .selectAll("text")
+    .data(textData)
+    .join("text")
+    .attr("style", "font-size: 14px;fill: red")
+    .attr("class", "mytext")
+    .html((d, i) => {
+      const texts = (d?.value || "").split("");
+      return texts
+        .map((text, i) => {
+          return `<tspan dx="${
+            i == 1 ? -14 : i == 0 ? 0 : Number(text) ? -8 : -14
+          }" dy="${20}">${text}</tspan>`;
+        })
+        .join("");
+    })
+    .attr(
+      "x",
+      (d, i) => viewConfig.step + i * viewConfig.micoStep + textLeftMargin
+    )
+    .attr("y", (d) => {
+      const texts = (d?.value || "").split("");
+      return isBottom
+        ? viewConfig.bottomKeysPosStart - texts.length * LINE_HEIGHT - 6
+        : viewConfig.topKeysPos - textLeftMargin;
+    });
 }
 
 function setPointerEvent(g, pointerObj) {
