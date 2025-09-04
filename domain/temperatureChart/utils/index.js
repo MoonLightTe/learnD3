@@ -15,6 +15,7 @@ import {
   LINE_HEIGHT,
   BOTTOM_KEYS,
   nightTime,
+  INFO_KEYS,
 } from "../const/index";
 import ViewConfig from "./viewConfig";
 
@@ -38,6 +39,7 @@ export function init(data) {
   Reflect.set(options, "renderData", groupData);
   const chart = ConnectedScatterplot(options);
   document.getElementById("temperatureChart").appendChild(chart);
+  downloadPNG(document.getElementById("printsvg"))
 }
 
 function ConnectedScatterplot(options) {
@@ -133,6 +135,9 @@ function ConnectedScatterplot(options) {
   viewConfig.renderData.brokenLineData.forEach((item) => {
     brokenLine(svg, item, viewConfig);
   });
+  viewConfig.renderData.datasetPulse.forEach((item) => {
+    drawHeart(svg, item, viewConfig);
+  });
   viewConfig.renderData.datasetHeartRate.forEach((item) => {
     drawHeartRate(svg, item, viewConfig);
   });
@@ -163,7 +168,244 @@ function ConnectedScatterplot(options) {
     viewConfig.renderData.allTemperatureData,
     viewConfig
   );
+  drawOtherInfo(svg, viewConfig);
+  drawTabelBorder(svg, viewConfig);
+  drawPulseDeficit(svg, viewConfig);
+
   return svg.node();
+}
+
+function drawPulseDeficit(svg, viewConfig) {
+  let datasetPulse = viewConfig.renderData.datasetPulse.flat(Infinity);
+  console.log("🚀 ~ drawPulseDeficit ~ datasetPulse:", datasetPulse);
+  let datasetHeartRate = viewConfig.renderData.datasetHeartRate.flat(Infinity);
+  console.log("🚀 ~ drawPulseDeficit ~ datasetHeartRate:", datasetHeartRate);
+  const indexList = [18, 24];
+  const points = [];
+  indexList.forEach((index) => {
+    let pulseItem = datasetPulse[index];
+    let X = viewConfig.xScale(index) + viewConfig.X_OFFSET;
+    let pulseY = viewConfig.heartScale(pulseItem.value);
+    // let heartY = viewConfig.heartScale(heartRateItem.value);
+    points.push([X, pulseY]);
+    // points.push([X, heartY]);
+  });
+  indexList.reverse().forEach((index) => {
+    let heartRateItem = datasetHeartRate[index];
+    let X = viewConfig.xScale(index) + viewConfig.X_OFFSET;
+    let heartY = viewConfig.heartScale(heartRateItem.value);
+    points.push([X, heartY]);
+  });
+  const g = getG(svg, viewConfig);
+  const defs = svg.append("defs");
+
+  const pattern = defs
+    .append("pattern")
+    .attr("id", "hatch-pattern") // 給圖樣一個唯一的ID
+    .attr("width", 8) // 圖樣單元的寬度
+    .attr("height", 8) // 圖樣單元的高度，寬高決定了斜線的間隔
+    .attr("patternUnits", "userSpaceOnUse") // 使用絕對座標，不受圖形大小影響
+    .attr("patternTransform", "rotate(45)"); // 將圖樣旋轉45度，讓直線變斜線
+
+  // 在圖樣中繪製一條基本的線段
+  pattern
+    .append("line")
+    .attr("x1", 0)
+    .attr("y1", 0)
+    .attr("x2", 0)
+    .attr("y2", 8) // 線的長度等於圖樣單元的高度
+    .attr("stroke", "blue")
+    .attr("stroke-width", 3);
+
+  // 3. 繪製四邊形並使用圖樣填充
+  g.append("polygon")
+    .attr("points", points.map((p) => p.join(",")).join(" "))
+    .attr("stroke", "black")
+    .attr("stroke-width", 2)
+    // 關鍵！將填充設定為引用我們的圖樣
+    .attr("fill", "url(#hatch-pattern)")
+    .attr("stroke", "none");
+
+  console.log("🚀 ~ drawPulseDeficit ~ points:", points);
+}
+
+function drawHeart(svg, pathData, viewConfig) {
+  console.log("🚀 ~ drawHeart ~ pathData:", pathData);
+  const indexList = d3.map(pathData, (_, i) => i);
+  const g = getG(svg, viewConfig);
+  const pointerObj = {
+    pathData: viewConfig.renderData.datasetPulse.flat(Infinity),
+    type: "脉搏",
+    viewConfig,
+    yScaleInstance: viewConfig.heartScale,
+  };
+  setPointerEvent(g, pointerObj);
+  const line = d3
+    .line()
+    .defined((i) => pathData[i].value)
+    .x((i) => {
+      return viewConfig.xScale(pathData[i].index) + viewConfig.X_OFFSET;
+    })
+    .y((i) => {
+      return viewConfig.heartScale(pathData[i].value || 0);
+    });
+  getDrawPath({
+    content: g,
+    line: line(indexList.filter((i) => isNumeric(pathData[i].value))),
+    stroke: "red",
+    viewConfig,
+  });
+  let iconObj = {
+    content: g,
+    data: d3.range(pathData.length),
+    x: getXPostion(pathData, viewConfig),
+    y: getYPosition(pathData, viewConfig.heartScale),
+    fill: "red",
+    stroke: "red",
+  };
+  drawRoundIcon(iconObj);
+}
+
+function drawTabelBorder(svg, viewConfig) {
+  const g = svg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${viewConfig.marginLeft},${viewConfig.topPos})`
+    );
+  g.append("line")
+    .attr("x1", 0)
+    .attr("y1", viewConfig.topKeysPos)
+    .attr("x2", viewConfig.step)
+    .attr("y2", viewConfig.topKeysPos)
+    .attr("stroke", viewConfig.stroke);
+
+  g.append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", viewConfig.contentWidth)
+    .attr("height", viewConfig.tableHeight)
+    .attr("stroke", viewConfig.stroke)
+    .attr("fill", "none")
+    .attr("style", "stroke-width: 2");
+}
+function drawOtherInfo(svg, viewConfig) {
+  console.log("🚀 ~ drawOtherInfo ~ viewConfig:", viewConfig);
+  const data = viewConfig.renderData.infoData;
+  const g = svg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${viewConfig.marginLeft},${viewConfig.marginTop})`
+    )
+    .attr("style", "font-size:14px;");
+  svg
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${viewConfig.marginLeft},${
+        viewConfig.bottomPos + viewConfig.marginTop + HEAD_HEIGHT
+      })`
+    )
+    .attr("style", "font-size:14px;")
+    .attr("class", "iconClass")
+    .call((g) => {
+      const dataList = [
+        {
+          name: "口温",
+          fn: drawRoundIcon,
+          params: {
+            content: g,
+            data: [0],
+          },
+        },
+        {
+          name: "腋温",
+          fn: drawXIcon,
+          params: {
+            content: g,
+            data: [0],
+          },
+        },
+        {
+          name: "肛温",
+          fn: drawRoundDotIcon,
+          params: {
+            content: g,
+            data: [0],
+          },
+        },
+        {
+          name: "耳温",
+          fn: drawThreeIcon,
+          params: {
+            content: g,
+            data: [0],
+          },
+        },
+        {
+          name: "心率",
+          fn: drawRoundIcon,
+          params: {
+            content: g,
+            data: [0],
+            fill: "white",
+            stroke: "red",
+          },
+        },
+        {
+          name: "脉搏",
+          fn: drawRoundIcon,
+          params: {
+            content: g,
+            data: [0],
+            fill: "red",
+            stroke: "red",
+          },
+        },
+      ];
+      g.append("text").text("标准：");
+      dataList.map((item, i) => {
+        g.append("text")
+          .text(item.name)
+          .attr("x", 40 + i * 80);
+        item.fn({
+          ...item.params,
+          x: () => 80 + i * 80,
+          y: () => -4,
+        });
+      });
+    });
+
+  g.append("text")
+    .attr("class", "mytext")
+    .attr("x", 0)
+    .attr("y", () => {
+      return HEAD_HEIGHT - TEXT_MARGIN_BOTTOM - 6;
+    })
+    .html(() => {
+      return INFO_KEYS.map(({ name, key }, index) => {
+        return `<tspan dx="${index === 0 ? 0 : 20}" dy="${0}">${name}: ${
+          data[key] ? data[key] : ""
+        }</tspan>`;
+      }).join("");
+    });
+  g.append("text")
+    .attr("style", "font-size:26px; text-anchor: middle")
+    .attr("class", "mytext")
+    .attr("x", viewConfig.width / 2)
+    .attr("y", () => {
+      return HEAD_HEIGHT - 4 * LINE_HEIGHT;
+    })
+    .text(data.title);
+  g.append("text")
+    .attr("style", "font-size:22px;text-anchor: middle;")
+    .attr("class", "mytext")
+    .attr("x", viewConfig.width / 2)
+    .attr("y", () => {
+      return HEAD_HEIGHT - 2 * LINE_HEIGHT - 6;
+    })
+    .text("体温单");
 }
 
 function drawCoolBody(svg, data, allData, viewConfig) {
@@ -1119,6 +1361,73 @@ function drawThreeIcon({
     });
 }
 
+function drawXIcon({ content, data, x, y, fill = "blue", stroke = "blue" }) {
+  content
+    .append("g")
+    .attr("fill", fill)
+    .attr("stroke", stroke)
+    .attr("stroke-width", 1)
+    .selectAll("line")
+    .data(data)
+    .join("line")
+    .attr("transform", (i) => {
+      let yVal = y;
+      if (typeof y === "function") {
+        yVal = y(i) || 0;
+      }
+      if (!yVal) {
+        return "scale(0)";
+      }
+      return "";
+    })
+    .attr("x1", function (d) {
+      return x(d) - 4;
+    })
+    .attr("y1", function (d) {
+      return y(d) - 4;
+    })
+    .attr("x2", function (d) {
+      return x(d) + 4;
+    })
+    .attr("y2", function (d) {
+      return y(d) + 4;
+    })
+    .clone()
+    .attr("x1", function (d) {
+      return x(d) + 4;
+    })
+    .attr("y1", function (d) {
+      return y(d) - 4;
+    })
+    .attr("x2", function (d) {
+      return x(d) - 4;
+    })
+    .attr("y2", function (d) {
+      return y(d) + 4;
+    });
+}
 function getTypeValue(type, allData = [], isNumber = true) {
   return allData.filter((item) => item.typeCode == type || null);
+}
+
+function downloadPNG(svgElement) {
+  const svgData = new XMLSerializer().serializeToString(svgElement);
+  const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(svgBlob);
+
+  const img = new Image();
+  img.onload = function () {
+    const canvas = document.createElement("canvas");
+    canvas.width = svgElement.clientWidth;
+    canvas.height = svgElement.clientHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    // 触发打印
+    const dataUrl = canvas.toDataURL("image/png");
+    const win = window.open("");
+    win.document.write(`<img src="${dataUrl}" onload="window.print();window.close()">`);
+  };
+  img.src = url;
 }
