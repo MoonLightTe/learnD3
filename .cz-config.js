@@ -31,5 +31,6 @@ module.exports = {
     },
 
     allowCustomScopes: true,
-    allowBreakingChanges: ['新增', '修复'], subjectLimit: 100
+    allowBreakingChanges: ['新增', '修复'],
+    subjectLimit: 100
 };

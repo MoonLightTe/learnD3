@@ -6,7 +6,8 @@
   "scripts": {
     "srcstart": "pnpm --filter @learnD3/src run dev",
     "domainStart": "pnpm --filter @learnD3/domain run dev",
-    "commit": "git cz"
+    "commit": "git cz",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "yueX",
@@ -14,6 +15,7 @@
   "packageManager": "pnpm@10.9.0",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "commitizen": "^4.3.1",
     "commitlint-config-cz": "^0.13.3",
     "cz-customizable": "^7.5.1",
@@ -23,11 +25,6 @@
   "config": {
     "commitizen": {
       "path": "cz-customizable"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -e -V"
     }
   }
 }
