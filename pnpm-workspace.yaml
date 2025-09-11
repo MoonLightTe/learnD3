@@ -4,3 +4,4 @@ packages:
   - "domain"
   - "dev/*"
   - "src"
+  - "theme"
