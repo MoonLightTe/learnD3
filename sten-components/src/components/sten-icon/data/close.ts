@@ -4,7 +4,7 @@ export default {
     childs: [
             {
         name: 'path',
-        attrs: { d: 'M13 1L1 13M1 1L13 13', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round'
+        attrs: { d: 'M13 1L1 13M1 1L13 13', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round'
                 },
             },
         ],

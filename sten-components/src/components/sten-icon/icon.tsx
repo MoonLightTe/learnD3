@@ -1,114 +1,85 @@
-import { h, FunctionalComponent, Host } from '@stencil/core';
-
-interface StenIconProps {
-    /**
-  
-   * icon 尺寸 默认 20
-  
-   */
-
-    size: number | string;
-
-    /**
-  
-   * styles 传入的css样式
-  
-   */
-
-    styles: object;
-
-    /**
-  
-   * 图标颜色
-  
-   */
-
-    color: string;
-
-    /**
-  
-   * 旋转的角度
-  
-   */
-
-    rotate: number;
-
-    /**
-  
-   * 是否自动旋转
-  
-   */
-
-    spin: boolean;
-
-    /**
-  
-   * 需要渲染的svg数据
-  
-   */
-
-    svgData: any;
-
-}
-
-
+import { FunctionalComponent, h, Host } from '@stencil/core';
+// import classnames from 'classnames';
 
 interface CSSStyle {
     [key: string]: string;
+}
+interface IconProps {
+    /**
+     * icon 尺寸 默认 20
+     */
+    size: number | string;
+    /**
+     * styles 传入的css样式
+     */
+    styles: object;
+    /**
+     * 传入的class名称
+     */
+    // classNames: string;
+    /**
+     * 图标颜色
+     */
     color: string;
-    transform?: string;
-}
-interface SvgData {
-    name: string;
-    attrs: Record<string, string | number>;
-    childs?: SvgData[];
-    _name?: string;
+    /**
+     * 旋转的角度
+     */
+    rotate: number;
+    /**
+     * 是否自动旋转
+     */
+    spin: boolean;
+    /**
+     * 需要渲染的svg数据
+     */
+    svgData: any;
 }
 
-export function convertToSvg(data: SvgData): string {
-    const attrsString = Object.entries(data.attrs)
-        .map(([key, value]) => `${key}="${value}"`)
-        .join(' ');
+/**
+ * @param str
+ */
+function hyphenate(str) {
+    return (str + '').replace(/[A-Z]/g, function (match) {
+        return '-' + match.toLowerCase();
+    });
+}
 
-    if (!data.childs) {
-        return `<${data.name} ${attrsString} />`;
+export const Icon: FunctionalComponent<IconProps> = props => {
+    const { size, styles, color, rotate, spin, svgData } = props;
+    if (!svgData) {
+        return false;
     }
 
-    const children = data.childs.map(child => convertToSvg(child)).join('\n  ');
-    return `<${data.name} ${attrsString}>\n  ${children}\n</${data.name}>`;
-}
-export const Icon: FunctionalComponent<StenIconProps> = ({ size, styles, color, rotate, spin, svgData }) => {
-    console.log("🚀 ~ Icon ~ color:", color)
-    console.log("🚀 ~ Icon ~ svgData:", svgData)
-    // 初始化 一个变量，先把 color 扔进去
-    const outerStyle: CSSStyle = { color: `#${color}` };
+    const _svgData = svgData.childs.map(child => {
+        const attrs = {};
+        Object.keys(child.attrs).forEach(attrName => {
+            attrs[hyphenate(attrName)] = child.attrs[attrName];
+        });
 
-    // 看下 rotate 是否是个合理的取值，如果是的话，把 outerStyle 的 transform 设置好
+        child.attrs = attrs;
+        return child;
+    });
+    console.log("🚀 ~ Icon ~ _svgData:", _svgData)
+
+    // const classPrefix: string = getClassPrefix('icon');
+
+    // const classes = classnames(classPrefix, classNames, `${classPrefix}-block`, { [`${classPrefix}-spin`]: spin });
+
+    const outerStyle: CSSStyle = { color };
+
     if (Number.isSafeInteger(rotate)) {
         outerStyle.transform = `rotate(${rotate}deg)`;
     }
 
-    // 最后把剩下的 styles 变量都加到当前变量
     Object.assign(outerStyle, styles);
 
-    // 解析 svgData 为 JSX 元素
-    const renderSvg = (data: SvgData) => {
-        const { name, attrs, childs } = data;
-        return h(
-            name,
-            {
-                ...attrs,
-                width: size,
-                height: size,
-                style: outerStyle
-            },
-            childs ? childs.map(child => renderSvg(child)) : []
-        );
-    };
-
     return (
-        <Host>
-            {renderSvg(svgData)}
+        <Host style={{ display: 'flex' }}>
+            <svg style={outerStyle} {...svgData.attrs} width={size} height={size}>
+                {_svgData.map(child =>
+                    child.name === 'rect' ? <rect {...child.attrs}></rect> : child.name === 'circle' ? <circle {...child.attrs}></circle> : <path {...child.attrs}></path>,
+                )}
+            </svg>
         </Host>
     );
-}
+};
