@@ -1,4 +1,5 @@
 import { Config } from '@stencil/core';
+import { sass } from '@stencil/sass'
 
 export const config: Config = {
   namespace: 'sten-components',
@@ -23,4 +24,9 @@ export const config: Config = {
   testing: {
     browserHeadless: "shell",
   },
+  plugins: [
+    sass({
+      // injectGlobalPaths 数组 全局通用的sass变量
+    })
+  ]
 };
