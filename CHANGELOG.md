@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/MoonLightTe/learnD3/compare/v1.1.0...v1.2.0) (2025-09-12)
+
+
+### 🚀 tool | 工具升级
+
+* **其它变更:** gitlog ([c291721](https://github.com/MoonLightTe/learnD3/commit/c291721f66a32173904da0319ae36361f45ecfe2))
+
+
+### ✨ Features | 新功能
+
+* **组件:** 新增stenciljs ([f5d11ce](https://github.com/MoonLightTe/learnD3/commit/f5d11ce70fa9c39c7d752f4de5fa44295c4391be))
+
 ## 1.1.0 (2025-09-11)
 
 
