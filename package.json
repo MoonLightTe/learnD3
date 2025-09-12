@@ -6,6 +6,8 @@
   "scripts": {
     "srcstart": "pnpm --filter @learnD3/src run dev",
     "domainStart": "pnpm --filter @learnD3/domain run dev",
+    "start:sten": "pnpm --filter @learnD3/sten-components run start",
+    "generate:sten": "pnpm --filter @learnD3/sten-components run generate",
     "commit": "git cz",
     "release": "standard-version",
     "prepare": "husky"
