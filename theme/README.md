@@ -32,3 +32,5 @@ Base：最基础的元素（elements），比如 img、p、link、list 等。
 Objects：某种设计模式，比如水平居中，
 Components：UI 组件，比如 button、switch、slider 等。
 Trumps：用于辅助和微调的样式，只有这一层才可以使用 !important。
+
+类名符合bem的规范

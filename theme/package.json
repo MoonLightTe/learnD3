@@ -1,13 +1,36 @@
 {
   "name": "@learnD3/theme",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "lib/index.css",
+  "style": "src/style-skin-1.css",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "gulp build",
+    "watch": "gulp dev"
   },
-  "keywords": [],
+  "keywords": [
+    "scss"
+  ],
+  "files": [
+    "lib",
+    "src"
+  ],
+  "devDependencies": {
+    "dart-sass": "^1.25.0",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-better-sass-inheritance": "^0.0.3",
+    "gulp-cached": "^1.1.1",
+    "gulp-cssmin": "^0.1.7",
+    "gulp-if": "^3.0.0",
+    "gulp-sass": "^6.0.1",
+    "onchange": "^7.1.0",
+    "sass": "^1.92.1"
+  },
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.9.0"
+  "gitHead": "adc4c7d866e650f50ad1f033b314f91e72996290",
+  "dependencies": {
+    "gulp-cached": "^1.1.1",
+    "gulp-watch": "^5.0.1"
+  }
 }

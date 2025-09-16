@@ -51,5 +51,8 @@
     "svgo": "^4.0.0",
     "svgson": "^5.3.1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@learnD3/theme": "workspace:*"
+  }
 }
