@@ -49,11 +49,12 @@ export const Icon: FunctionalComponent<IconProps> = props => {
     if (!svgData) {
         return false;
     }
-
-    const _svgData = svgData.childs.map(child => {
+    
+    console.log("🚀 ~ Icon ~ svgData:", svgData)
+    const _svgData = svgData.children.map(child => {
         const attrs = {};
-        Object.keys(child.attrs).forEach(attrName => {
-            attrs[hyphenate(attrName)] = child.attrs[attrName];
+        Object.keys(child.attributes).forEach(attrName => {
+            attrs[hyphenate(attrName)] = child.attributes[attrName];
         });
 
         child.attrs = attrs;

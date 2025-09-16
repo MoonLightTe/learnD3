@@ -65,11 +65,12 @@ async function build(entryDir, outDir, outDirEsm, prefix, suffix) {
         try {
             const filePath = resolve(entryDir, file)
             const svgString = fs.readFileSync(filePath, 'utf-8')
-            const svgName =formatName(basename(file, '.svg'))
+            const tagName = basename(file, '.svg')
+            const svgName =formatName(tagName)
             console.log("🚀 ~ build ~ svgName:", svgName)
             const jsonFileName = `${svgName}.js`
             let JSONCode = await translateSvg(svgString, svgName);
-            JSONCode._name = svgName
+            JSONCode._name = tagName
             let _JSONCode = `exports.default=${JSON.stringify(JSONCode)}`
             fs.writeFileSync(resolve(outDir, jsonFileName), _JSONCode, 'utf-8')
             let _JSONCode_esm = `export default ${JSON.stringify(JSONCode)}`;

@@ -24,6 +24,222 @@ export namespace Components {
     }
     interface StenIcon {
     }
+    interface StenIconAaC {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
+    interface StenIconAdd {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
+    interface StenIconAddImage {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
+    interface StenIconAddUser {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
+    interface StenIconAlertCloseCollapse {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
+    interface StenIconAlertErrorC {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
+    interface StenIconAlertErrorCircleC {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
+    interface StenIcons {
+        /**
+          * 传入的class名称
+         */
+        "classNames": string;
+        /**
+          * 图标颜色
+         */
+        "color": string;
+        /**
+          * 旋转的角度
+         */
+        "rotate": number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size": number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin": boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles": object;
+    }
 }
 declare global {
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
@@ -44,10 +260,66 @@ declare global {
         prototype: HTMLStenIconElement;
         new (): HTMLStenIconElement;
     };
+    interface HTMLStenIconAaCElement extends Components.StenIconAaC, HTMLStencilElement {
+    }
+    var HTMLStenIconAaCElement: {
+        prototype: HTMLStenIconAaCElement;
+        new (): HTMLStenIconAaCElement;
+    };
+    interface HTMLStenIconAddElement extends Components.StenIconAdd, HTMLStencilElement {
+    }
+    var HTMLStenIconAddElement: {
+        prototype: HTMLStenIconAddElement;
+        new (): HTMLStenIconAddElement;
+    };
+    interface HTMLStenIconAddImageElement extends Components.StenIconAddImage, HTMLStencilElement {
+    }
+    var HTMLStenIconAddImageElement: {
+        prototype: HTMLStenIconAddImageElement;
+        new (): HTMLStenIconAddImageElement;
+    };
+    interface HTMLStenIconAddUserElement extends Components.StenIconAddUser, HTMLStencilElement {
+    }
+    var HTMLStenIconAddUserElement: {
+        prototype: HTMLStenIconAddUserElement;
+        new (): HTMLStenIconAddUserElement;
+    };
+    interface HTMLStenIconAlertCloseCollapseElement extends Components.StenIconAlertCloseCollapse, HTMLStencilElement {
+    }
+    var HTMLStenIconAlertCloseCollapseElement: {
+        prototype: HTMLStenIconAlertCloseCollapseElement;
+        new (): HTMLStenIconAlertCloseCollapseElement;
+    };
+    interface HTMLStenIconAlertErrorCElement extends Components.StenIconAlertErrorC, HTMLStencilElement {
+    }
+    var HTMLStenIconAlertErrorCElement: {
+        prototype: HTMLStenIconAlertErrorCElement;
+        new (): HTMLStenIconAlertErrorCElement;
+    };
+    interface HTMLStenIconAlertErrorCircleCElement extends Components.StenIconAlertErrorCircleC, HTMLStencilElement {
+    }
+    var HTMLStenIconAlertErrorCircleCElement: {
+        prototype: HTMLStenIconAlertErrorCircleCElement;
+        new (): HTMLStenIconAlertErrorCircleCElement;
+    };
+    interface HTMLStenIconsElement extends Components.StenIcons, HTMLStencilElement {
+    }
+    var HTMLStenIconsElement: {
+        prototype: HTMLStenIconsElement;
+        new (): HTMLStenIconsElement;
+    };
     interface HTMLElementTagNameMap {
         "my-component": HTMLMyComponentElement;
         "sten-button": HTMLStenButtonElement;
         "sten-icon": HTMLStenIconElement;
+        "sten-icon-aa-c": HTMLStenIconAaCElement;
+        "sten-icon-add": HTMLStenIconAddElement;
+        "sten-icon-add-image": HTMLStenIconAddImageElement;
+        "sten-icon-add-user": HTMLStenIconAddUserElement;
+        "sten-icon-alert-close-collapse": HTMLStenIconAlertCloseCollapseElement;
+        "sten-icon-alert-error-c": HTMLStenIconAlertErrorCElement;
+        "sten-icon-alert-error-circle-c": HTMLStenIconAlertErrorCircleCElement;
+        "sten-icons": HTMLStenIconsElement;
     }
 }
 declare namespace LocalJSX {
@@ -69,10 +341,234 @@ declare namespace LocalJSX {
     }
     interface StenIcon {
     }
+    interface StenIconAaC {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
+    interface StenIconAdd {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
+    interface StenIconAddImage {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
+    interface StenIconAddUser {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
+    interface StenIconAlertCloseCollapse {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
+    interface StenIconAlertErrorC {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
+    interface StenIconAlertErrorCircleC {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
+    interface StenIcons {
+        /**
+          * 传入的class名称
+         */
+        "classNames"?: string;
+        /**
+          * 图标颜色
+         */
+        "color"?: string;
+        /**
+          * 旋转的角度
+         */
+        "rotate"?: number;
+        /**
+          * icon 尺寸 默认 20
+          * @default 20
+         */
+        "size"?: number | string;
+        /**
+          * 是否自动旋转
+         */
+        "spin"?: boolean;
+        /**
+          * styles 传入的css样式
+         */
+        "styles"?: object;
+    }
     interface IntrinsicElements {
         "my-component": MyComponent;
         "sten-button": StenButton;
         "sten-icon": StenIcon;
+        "sten-icon-aa-c": StenIconAaC;
+        "sten-icon-add": StenIconAdd;
+        "sten-icon-add-image": StenIconAddImage;
+        "sten-icon-add-user": StenIconAddUser;
+        "sten-icon-alert-close-collapse": StenIconAlertCloseCollapse;
+        "sten-icon-alert-error-c": StenIconAlertErrorC;
+        "sten-icon-alert-error-circle-c": StenIconAlertErrorCircleC;
+        "sten-icons": StenIcons;
     }
 }
 export { LocalJSX as JSX };
@@ -82,6 +578,14 @@ declare module "@stencil/core" {
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             "sten-button": LocalJSX.StenButton & JSXBase.HTMLAttributes<HTMLStenButtonElement>;
             "sten-icon": LocalJSX.StenIcon & JSXBase.HTMLAttributes<HTMLStenIconElement>;
+            "sten-icon-aa-c": LocalJSX.StenIconAaC & JSXBase.HTMLAttributes<HTMLStenIconAaCElement>;
+            "sten-icon-add": LocalJSX.StenIconAdd & JSXBase.HTMLAttributes<HTMLStenIconAddElement>;
+            "sten-icon-add-image": LocalJSX.StenIconAddImage & JSXBase.HTMLAttributes<HTMLStenIconAddImageElement>;
+            "sten-icon-add-user": LocalJSX.StenIconAddUser & JSXBase.HTMLAttributes<HTMLStenIconAddUserElement>;
+            "sten-icon-alert-close-collapse": LocalJSX.StenIconAlertCloseCollapse & JSXBase.HTMLAttributes<HTMLStenIconAlertCloseCollapseElement>;
+            "sten-icon-alert-error-c": LocalJSX.StenIconAlertErrorC & JSXBase.HTMLAttributes<HTMLStenIconAlertErrorCElement>;
+            "sten-icon-alert-error-circle-c": LocalJSX.StenIconAlertErrorCircleC & JSXBase.HTMLAttributes<HTMLStenIconAlertErrorCircleCElement>;
+            "sten-icons": LocalJSX.StenIcons & JSXBase.HTMLAttributes<HTMLStenIconsElement>;
         }
     }
 }

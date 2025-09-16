@@ -6,6 +6,7 @@
   "scripts": {
     "srcstart": "pnpm --filter @learnD3/src run dev",
     "buildSvg": "pnpm --filter @learnD3/sten-components run buildSvg",
+    "generatorSvg": "pnpm --filter @learnD3/sten-components run generatorSvg",
     "domainStart": "pnpm --filter @learnD3/domain run dev",
     "start:sten": "pnpm --filter @learnD3/sten-components run start",
     "generate:sten": "pnpm --filter @learnD3/sten-components run generate",
