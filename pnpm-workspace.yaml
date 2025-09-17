@@ -1,6 +1,6 @@
 packages:
   # 存放
-  - "base/*"
+  - "base"
   - "domain"
   - "dev/*"
   - "src"

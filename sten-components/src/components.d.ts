@@ -240,6 +240,8 @@ export namespace Components {
          */
         "styles": object;
     }
+    interface StenImage {
+    }
 }
 declare global {
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
@@ -308,6 +310,12 @@ declare global {
         prototype: HTMLStenIconsElement;
         new (): HTMLStenIconsElement;
     };
+    interface HTMLStenImageElement extends Components.StenImage, HTMLStencilElement {
+    }
+    var HTMLStenImageElement: {
+        prototype: HTMLStenImageElement;
+        new (): HTMLStenImageElement;
+    };
     interface HTMLElementTagNameMap {
         "my-component": HTMLMyComponentElement;
         "sten-button": HTMLStenButtonElement;
@@ -320,6 +328,7 @@ declare global {
         "sten-icon-alert-error-c": HTMLStenIconAlertErrorCElement;
         "sten-icon-alert-error-circle-c": HTMLStenIconAlertErrorCircleCElement;
         "sten-icons": HTMLStenIconsElement;
+        "sten-image": HTMLStenImageElement;
     }
 }
 declare namespace LocalJSX {
@@ -557,6 +566,8 @@ declare namespace LocalJSX {
          */
         "styles"?: object;
     }
+    interface StenImage {
+    }
     interface IntrinsicElements {
         "my-component": MyComponent;
         "sten-button": StenButton;
@@ -569,6 +580,7 @@ declare namespace LocalJSX {
         "sten-icon-alert-error-c": StenIconAlertErrorC;
         "sten-icon-alert-error-circle-c": StenIconAlertErrorCircleC;
         "sten-icons": StenIcons;
+        "sten-image": StenImage;
     }
 }
 export { LocalJSX as JSX };
@@ -586,6 +598,7 @@ declare module "@stencil/core" {
             "sten-icon-alert-error-c": LocalJSX.StenIconAlertErrorC & JSXBase.HTMLAttributes<HTMLStenIconAlertErrorCElement>;
             "sten-icon-alert-error-circle-c": LocalJSX.StenIconAlertErrorCircleC & JSXBase.HTMLAttributes<HTMLStenIconAlertErrorCircleCElement>;
             "sten-icons": LocalJSX.StenIcons & JSXBase.HTMLAttributes<HTMLStenIconsElement>;
+            "sten-image": LocalJSX.StenImage & JSXBase.HTMLAttributes<HTMLStenImageElement>;
         }
     }
 }

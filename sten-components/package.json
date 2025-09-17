@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "build": "stencil build",
-    "start": "stencil build --dev --watch --serve",
+    "start": "stencil build --dev --watch --serve --prune",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
@@ -53,6 +53,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@learnD3/base": "workspace:*",
     "@learnD3/theme": "workspace:*"
   }
 }
