@@ -4,7 +4,7 @@ import { sass } from '@stencil/sass'
 
 export const config: Config = {
   namespace: 'sten-components',
-  globalStyle: './node_modules/@learnD3/theme/lib/index.css',
+  globalStyle: 'node_modules/@learnD3/theme/lib/index.css',
   outputTargets: [
     {
       type: 'dist',
