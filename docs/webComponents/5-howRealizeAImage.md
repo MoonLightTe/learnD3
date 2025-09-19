@@ -160,3 +160,16 @@ $$
 & \text{结论：} T_i \le T_c \text{ 时，CSS 为 } \text{width: auto; height: 100\%;}
 \end{aligned}
 $$
+
+### 实现公共方法
+
+[英语](https://www.languagegrowth.com/zh-CN)
+
+#### throttled
+
+creates a throttled function that only invokes func at most once pre every wait milliseconds
+创建一个受限的函数，这个函数在等待毫秒中最多只能调用一次
+
+
+#### debounce
+

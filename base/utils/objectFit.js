@@ -13,7 +13,6 @@ const objectFitEnum = {
 
 
 export function objectFitPolyfill({ fit, imageHeight, imageWidth, element }) {
-    console.log("🚀 ~ objectFitPolyfill ~ image:", image)
     const { clientWidth: containerWidth, clientHeight: containerHeight } = element
     let _fit = fit
     if (!imageHeight || !imageWidth || !containerHeight || !containerWidth) return

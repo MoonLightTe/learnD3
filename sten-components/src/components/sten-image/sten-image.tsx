@@ -1,5 +1,5 @@
 import { Component, Host, h } from '@stencil/core';
-import { BEM } from '@learnD3/base'
+import { BEM, objectFitPolyfill } from '@learnD3/base'
 
 @Component({
   tag: 'sten-image',
@@ -8,7 +8,7 @@ import { BEM } from '@learnD3/base'
 })
 export class StenImage {
   componentWillLoad() {
-    // console.log('BEM', BEM);
+    console.log('objectFitPolyfill', objectFitPolyfill);
     // const b = new BEM('image')
     // console.log("🚀 ~ StenImage ~ componentWillLoad ~ b:", b)
   }
