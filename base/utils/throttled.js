@@ -30,7 +30,3 @@ export function throttled(callback, wait = 500) {
     return throttled
 }
 
-
-export function debounce(callback, wait = 500) {
-
-}
