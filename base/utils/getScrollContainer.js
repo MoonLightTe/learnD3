@@ -1,4 +1,4 @@
-// const topPlayer = [window, document, document.documentElement]
+const topPlayer = [window, document, document.documentElement]
 const SPECIAL_CHARS_REGEXP = /([\:\-\_]+(.))/g;
 const MOZ_HACK_REGEXP = /^moz([A-Z])/;
 

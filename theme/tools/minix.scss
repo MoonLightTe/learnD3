@@ -13,7 +13,7 @@
 }
 
 @mixin e($element) {
-    $E: $select !global;
+    $E: $element !global;
     $selector: &;
     $currentSelector: "";
 

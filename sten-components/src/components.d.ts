@@ -241,6 +241,30 @@ export namespace Components {
         "styles": object;
     }
     interface StenImage {
+        /**
+          * 错误文案
+          * @default '加载失败'
+         */
+        "errorText": string;
+        /**
+          * 图片填充模式
+          * @default 'none'
+         */
+        "fit": 'none' | 'contain' | 'cover' | 'fill' | 'scale-down';
+        /**
+          * lazy 是否懒加载
+          * @default false
+         */
+        "lazy": boolean;
+        /**
+          * 加载文案
+          * @default '加载中'
+         */
+        "placeholder": string;
+        /**
+          * src 图片路径
+         */
+        "src": string;
     }
 }
 declare global {
@@ -567,6 +591,30 @@ declare namespace LocalJSX {
         "styles"?: object;
     }
     interface StenImage {
+        /**
+          * 错误文案
+          * @default '加载失败'
+         */
+        "errorText"?: string;
+        /**
+          * 图片填充模式
+          * @default 'none'
+         */
+        "fit"?: 'none' | 'contain' | 'cover' | 'fill' | 'scale-down';
+        /**
+          * lazy 是否懒加载
+          * @default false
+         */
+        "lazy"?: boolean;
+        /**
+          * 加载文案
+          * @default '加载中'
+         */
+        "placeholder"?: string;
+        /**
+          * src 图片路径
+         */
+        "src"?: string;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;

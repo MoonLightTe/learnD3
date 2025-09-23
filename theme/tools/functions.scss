@@ -4,7 +4,7 @@
 
 @function selectorToString($selector) {
     $selector: inspect($selector);
-    $selector: str-slice($string: $selector, $start: 2, $end: -2);
+    $selector: str-slice($string: $selector, $start-at:2, $end-at: -2);
     @return $selector;
 }
 

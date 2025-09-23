@@ -1,10 +1,8 @@
 import { Component, Host, h, Prop, Element, State, Watch, Listen } from '@stencil/core';
-import { BEM, objectFitPolyfill, throttled } from '@learnD3/base'
+import { BEM, objectFitPolyfill, throttled, isInContainer, getScrollContainer } from '@learnD3/base'
 
 @Component({
   tag: 'sten-image',
-  styleUrl: 'sten-image.scss',
-  shadow: true,
 })
 export class StenImage {
   /** src 图片路径 */
@@ -28,9 +26,15 @@ export class StenImage {
 
   private _scrollContainer: HTMLElement | (Window & typeof globalThis);
   private _handleLazyLoad: any;
-  @Listen('scroll', { target: 'window',capture: true })
-  handleScroll(){
-    if(!this.lazy) return 
+  @Watch('show')
+  watchHandler(_newValue, oldValue) {
+    if (oldValue) return;
+    this.loadImg();
+  }
+
+  @Listen('scroll', { target: 'window', capture: true })
+  handleScroll() {
+    if (!this.lazy) return
     this._handleLazyLoad()
   }
   loadImg() {
@@ -38,11 +42,14 @@ export class StenImage {
     this.loading = true
     this.error = false
     const img = new Image()
+    console.log("🚀 ~ StenImage ~ loadImg ~ img:", img)
     img.onload = (e) => this.handleLoad(e, img)
     img.onerror = this.handleError.bind(this)
+    img.src = this.src
   }
 
   handleLoad(e: Event, image: HTMLImageElement) {
+    console.log("<><><><>")
     this.imageWidth = image.width;
     this.imageHeight = image.height;
     this.loading = false;
@@ -50,32 +57,47 @@ export class StenImage {
   }
 
   handleError(error: OnErrorEventHandlerNonNull) {
+    console.log("🚀 ~ StenImage ~ handleError ~ error:", error)
     this.loading = false
     this.error = true
   }
 
-
+  handleLazyLoad() {
+    if (this.show) return;
+    if (isInContainer(this.element, this._scrollContainer as HTMLElement)) {
+      this.show = true;
+    }
+  }
 
   componentWillLoad() {
-    console.log('objectFitPolyfill', objectFitPolyfill);
+    // console.log('objectFitPolyfill', objectFitPolyfill);
     console.log(this.element)
+    console.log(this.src)
     if (!this.lazy) {
       this.loadImg()
     }
-    
-    // this._handleLazyLoad = 
-    // const b = new BEM('image')
-    // console.log("🚀 ~ StenImage ~ componentWillLoad ~ b:", b)
+
+    this._scrollContainer = getScrollContainer(this.element)
+    this.handleLazyLoad = this.handleLazyLoad.bind(this);
+    this._scrollContainer = getScrollContainer(this.element);
+    this._handleLazyLoad = throttled(this.handleLazyLoad, 200);
   }
 
   render() {
-    let { loading, error, errorText, placeholder, src } = this
+    let { loading, error, errorText, placeholder, src, element, imageHeight, imageWidth, fit } = this
     const bem = new BEM('image')
+    const styles = objectFitPolyfill({
+      element,
+      imageHeight,
+      imageWidth,
+      fit
+    })
+    console.log("🚀 ~ StenImage ~ render ~ styles:", styles)
     return (
-      <Host class={bem.B()}>
-        {!loading && !error && <img src={src} class={bem.M('inner')}></img>}
-        {loading && <div class={bem.M('placeholder')}>{placeholder}</div>}
-        {error && <div class={bem.M('errorText')}>{errorText}</div>}
+      <Host style={{ display: 'block' }} class={bem.B()}>
+        {!loading && !error && <img src={src} style={styles} class={bem.E('inner')}></img>}
+        {loading && <div class={bem.E('placeholder')}>{placeholder}</div>}
+        {error && <div class={bem.E('errorText')}>{errorText}</div>}
       </Host>
     );
   }
