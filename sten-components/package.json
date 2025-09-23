@@ -45,6 +45,7 @@
     "@stencil/sass": "^3.2.2",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.5",
+    "dumi": "^2.4.21",
     "jest": "^29.7.0",
     "jest-cli": "^29.7.0",
     "puppeteer": "^24.3.0",
