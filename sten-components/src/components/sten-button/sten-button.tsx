@@ -1,6 +1,5 @@
 import { Component, Host, Method, h } from '@stencil/core';
-// import { debounce } from '@learnD3/base'
-import { debounce } from '../../../../base/utils/debounce.js'
+import { debounce } from '@learnD3/base'
 
 @Component({
   tag: 'sten-button',

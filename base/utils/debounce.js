@@ -14,8 +14,6 @@ import { isObject } from './baseUntil'
  * @param {boolean} [options.trailing=true]
  * Specify invoking on the trailing edge of the timeout.
  * @returns {Function} Returns the new debounced function.
- * 
- * 
  */
 export function debounce(callback, wait = 500, options) {
     let lastArgs,
