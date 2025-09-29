@@ -1,65 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <!-- <img src="./static/dog.svg" alt="" /> -->
-    <svg
-      class="smiley"
-      width="256"
-      height="256"
-      viewBox="0 0 256 256"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-    >
-      <title>测试</title>
-      <desc>使用svg画一个笑脸</desc>
-      <style>
-        .smiley {
-          cursor: pointer;
-        }
 
-        .left-eyebrow {
-          transform: rotate(80deg);
-          transform-origin: 100px 82px;
-          transition: all 0.5s linear;
-        }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <style>
+    .folder {
+      width: 100px;
+      height: 100px;
+    }
 
-        .right-eyebrow {
-          transform: rotate(100deg);
-          transform-origin: 156px 82px;
-          transition: all 0.5s linear;
-        }
+    .word {
+      width: 100vw;
+      height: 100vh;
+      background: url("https://files.codelife.cc/wallhaven/full/w8/wallhaven-w82qyx.jpg?x-oss-process=image/resize,limit_0,m_fill,w_286,h_172/quality,Q_90/format,webp") no-repeat center / cover, radial-gradient(circle, rgb(131 58 180) 0%, rgb(253 29 29) 50%, rgb(252 176 69) 100%) no-repeat center /cover;
+      background-blend-mode: difference;
+      clip-path: url(#clip);
+    }
+  </style>
+</head>
 
-        .smiley:hover .left-eyebrow {
-          transform: rotate(100deg);
-        }
+<body>
+  <!-- <img src="./static/dog.svg" alt="" /> -->
+  <svg
+    class="smiley"
+    width="256"
+    height="256"
+    viewBox="0 0 256 256"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>测试</title>
+    <desc>使用svg画一个笑脸</desc>
+    <style>
+      .smiley {
+        cursor: pointer;
+      }
 
-        .smiley:hover .right-eyebrow {
-          transform: rotate(80deg);
-        }
-      </style>
-      <circle class="face" cx="128" cy="128" r="120" fill="gold"></circle>
-      <g>
-        <circle class="left-eye" cx="100" cy="104" r="12"/>
-        <circle class="right-eye" cx="156" cy="104" r="12"/>
-      </g>
-      <g class="eyebrows">
-        <rect class="left-eyebrow" x="97" y="66" width="6" height="32" rx="4" />
-        <rect class="right-eyebrow" x="153" y="66" width="6" height="32" rx="4" />
-      </g>
-      <!-- <circle class="face" cx="128" cy="128" r="120" fill="gold"></circle> -->
-      <path
-        class="mouth"
-        d="M100,160 Q128,190 156, 160"
-        fill="none"
-        stroke="#000"
-        stroke-width="6"
-        stroke-linecap="round"
-      />
-    </svg>
-  </body>
+      .left-eyebrow {
+        transform: rotate(80deg);
+        transform-origin: 100px 82px;
+        transition: all 0.5s linear;
+      }
+
+      .right-eyebrow {
+        transform: rotate(100deg);
+        transform-origin: 156px 82px;
+        transition: all 0.5s linear;
+      }
+
+      .smiley:hover .left-eyebrow {
+        transform: rotate(100deg);
+      }
+
+      .smiley:hover .right-eyebrow {
+        transform: rotate(80deg);
+      }
+    </style>
+    <circle class="face" cx="128" cy="128" r="120" fill="gold">
+    </circle>
+    <g>
+      <circle class="left-eye" cx="100" cy="104" r="12" />
+      <circle class="right-eye" cx="156" cy="104" r="12" />
+    </g>
+    <g class="eyebrows">
+      <rect class="left-eyebrow" x="97" y="66" width="6" height="32"
+        rx="4" />
+      <rect
+        class="right-eyebrow"
+        x="153"
+        y="66"
+        width="6"
+        height="32"
+        rx="4" />
+    </g>
+    <!-- <circle class="face" cx="128" cy="128" r="120" fill="gold"></circle> -->
+    <path
+      class="mouth"
+      d="M100,160 Q128,190 156, 160"
+      fill="none"
+      stroke="#000"
+      stroke-width="6"
+      stroke-linecap="round" />
+  </svg>
+  <svg xmlns="https://www.w3.org/2000/svg" class="sr-only">
+    <defs>
+      <symbol id="icon-folder" viewBox="0 0 32 32">
+        <title>folder</title>
+        <path d="M14 4l4 4h14v22h-32v-26z" fill="currentColor"></path>
+      </symbol>
+      <symbol id="icon-folder-open" viewBox="0 0 32 32">
+        <title>open</title>
+        <path
+          d="M26 30l6-16h-26l-6 16zM4 12l-4 18v-26h9l4 4h13v4z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="icon-folder-plus" viewBox="0 0 32 32">
+        <title>plus</title>
+        <path
+          d="M18 8l-4-4h-14v26h32v-22h-14zM22 22h-4v4h-4v-4h-4v-4h4v-4h4v4h4v4z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="icon-folder-minus" viewBox="0 0 32 32">
+        <title>minus</title>
+        <path
+          d="M18 8l-4-4h-14v26h32v-22h-14zM22 22h-12v-4h12v4z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="icon-folder-download" viewBox="0 0 32 32">
+        <title>download</title>
+        <path
+          d="M18 8l-4-4h-14v26h32v-22h-14zM16 27l-7-7h5v-8h4v8h5l-7 7z"
+          fill="currentColor"></path>
+      </symbol>
+      <symbol id="icon-folder-upload" viewBox="0 0 32 32">
+        <title>upload</title>
+        <path
+          d="M18 8l-4-4h-14v26h32v-22h-14zM16 15l7 7h-5v8h-4v-8h-5l7-7z"
+          fill="currentColor"></path>
+      </symbol>
+    </defs>
+    <defs>
+      <clipPath id="clip">
+        <text x="0" y="300" font-size="10rem" font-weight="900"
+          font-family="Exo">I Love Me(^_^)</text>
+      </clipPath>
+    </defs>
+  </svg>
+  </svg>
+  <svg class="folder" viewBox="0 0 100 100">
+    <use xlink:href="#icon-folder"></use>
+  </svg>
+
+  <div class="word">
+    <span class="sr-only">I Love Me(^_^)</span>
+  </div>
+</body>
+
 </html>
