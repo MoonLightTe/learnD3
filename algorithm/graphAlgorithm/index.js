@@ -76,3 +76,14 @@ function selectionSort(arr) {
 let testArr  = [5,11,2,33,23,41,21,23,45,23]
 const a = selectionSort(testArr)
 console.log("🚀 ~ a:", a)
+
+
+
+/***
+ * divide and conquer
+ * 找到基线条件，不断逼近基线条件。
+ * 
+ */
+function quickSortRecursive(arr){
+    
+}
