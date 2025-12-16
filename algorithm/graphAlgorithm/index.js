@@ -73,7 +73,7 @@ function selectionSort(arr) {
     return selectionArr
 }
 
-let testArr  = [5,11,2,33,23,41,21,23,45,23]
+let testArr = [5, 11, 2, 33, 23, 41, 21, 23, 45, 23]
 const a = selectionSort(testArr)
 console.log("🚀 ~ a:", a)
 
@@ -84,6 +84,62 @@ console.log("🚀 ~ a:", a)
  * 找到基线条件，不断逼近基线条件。
  * 
  */
-function quickSortRecursive(arr){
-    
+function quickSortRecursive(arr) {
+    if (arr.length <= 1) return arr
+    const pivotIndex = Math.floor(Math.random() * arr.length);
+    let highArr = []
+    let lowArr = []
+    let baseItem = arr[pivotIndex]
+    for (let index = 1; index < arr.length; index++) {
+        const element = arr[index];
+        if (element > baseItem) {
+            highArr.push(element)
+        } else if (element <= baseItem) {
+            lowArr.push(element)
+        }
+    }
+    highArr = quickSortRecursive(highArr)
+    lowArr = quickSortRecursive(lowArr)
+    return [...lowArr, baseItem, ...highArr]
 }
+
+/**
+ * 基线条件
+ */
+function improvementQuickSortRecursive(arr) {
+    let len = arr.length
+    if (len <= 1) return arr
+    let pivotIndex = Math.floor(Math.random() * len)
+    let pivot = arr[pivotIndex]
+    [arr[0], arr[pivotIndex]] = [arr[pivotIndex], arr[0]]
+    let low = []
+    let high = []
+    let equal = []
+    for (let index = 0; index < len; index++) {
+        const element = arr[index];
+        if (index === 0 && element === pivot) {
+            continue
+        }
+        if (element < pivot) {
+            low.push(element)
+        } else if (element > pivot) {
+            high.push(element)
+        } else {
+            equal.push(element)
+        }
+    }
+    const sortedLow = improvementQuickSortRecursive(low)
+    const sortedHigh = improvementQuickSortRecursive(high)
+    return [...sortedLow, pivot, ...equal, ...sortedHigh]
+}
+
+const a1 = [2, 55, 11, 22, 34, 21, 2, 444, 56, 38, 23, 1, 23, 11, 55, 44, 32, 36, 64, 63, 78, 89, 2, 12, 23, 100]
+
+console.time('r1')
+const r1  =quickSortRecursive(a1)
+console.log("🚀 ~ r1:", r1)
+console.timeEnd('r1')
+console.time('r2')
+const r2 =improvementQuickSortRecursive(a1)
+console.log("🚀 ~ r2:", r2)
+console.timeEnd('r2')
