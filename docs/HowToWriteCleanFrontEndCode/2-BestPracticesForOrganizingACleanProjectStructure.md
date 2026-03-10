@@ -51,4 +51,145 @@ MECE是Mutually Exclusive，Collectively Exhaustive
 > 四象限
 > 工作重要和紧急
 > 重要紧急、重要但不紧急、紧急但不重要、既不紧急也不重要
+>
+>
 
+分层思维
+通过分层将复杂的软件系统划分为一系列相互独立且功能明确的层次，每个层次都只关心这个层次赋予的职责，从而实现了关注点的分离；
+每个层次我们都可以使用MECE原则再分为多个子模块，进一步将一个复杂问题拆解为一些小问题，逐个击破，将很难完成的复杂任务消化掉。
+
+For example
+MVC
+M表示model 模型 负责数据的存储，检索和更新等操作，模型通常与数据库交互，执行数据的增删改查；
+V表示view 视图 负责数据的展示，视图从模型中获得数据，并将其以特定的格式呈现给用户；
+C表示 controller 复杂接受用户的输入，然后调用模型获取数据返回给用户或者将用户传来的数据保存到数据库中。
+
+划分前端组件
+
+- 通用组件
+- 项目基础组件
+- 业务组件
+- 页面组件
+高层组件可以调用底层组件，底层组件绝对不可以引入高层组件
+
+领域设计驱动 DDD
+
+Domain-driven Design
+就是一种以领域专家、设计人员、开发人员都能理解的通用语言作为相互交流的工具，在交流的过程中发现领域概念，然后将这些概念设计成一个领域模型；
+由领域模型驱动软件设计，用代码来实现改领域模型；
+
+SOLID
+
+SRP signle responsibility principle(单一职责原则)
+一个类别只应该有一个职责
+
+```javascript
+// 错误示范
+class Error_ShoppingCart{
+    constructor(){
+        this.items = []
+        this.total = 0
+    }
+
+    add(item){
+        this.items.push(item)
+        this.total += item.price
+    }
+
+    delete(item){
+        let index = this.items.findIndex((goods)=> goods.id === item.id)
+        if(!~index) return console.log('error')
+        this.items.splice(index, 1)
+        this.total -= item.print
+    }
+
+    print(){
+
+    }
+}
+// 拆分上述逻辑 一个类别只负责一件事
+
+class ShoppingCart {
+    constructor(){
+        this.items = []
+    }
+    add(items){
+        this.items.push(item)
+    }
+    remove(itemId){
+        this.items = this.items.filter((item)=> item.id !== itemId)
+    }
+}
+
+class PriceCalculator {
+    static getPrice(items){
+        return item.reduce((sum,item)=> sum + item.price,0)
+    }
+}
+
+class CartPresenter{
+    static log(cart){
+        return 
+    }
+    
+}
+```
+
+open-closed Principle(开放封闭原则)
+软件实体应该对扩展开放，对修改封闭
+拓展实体，而非修改。
+
+```javascript
+class ErrorShoppingCart {
+    constructor(){
+        this.items = []
+    }
+
+    add(items){
+        this.items.push(item)
+    }
+    remove(itemId){
+        this.items = this.items.filter((item)=> item.id !== itemId)
+    }
+    get getPrice(){
+        return this.items.reduce((sum,item)=> sum += item.price,0)
+    }
+    get  totalPrice(){
+        return this.getPrice()
+    }
+    get  totalPrice90(){
+        return this.getPrice() * 0.9
+    }
+
+    ...
+
+}
+// 打9折 这些怎么办
+
+cosnt discountStrategies = {
+    none:(price) => price,
+    standard90:(price) => price * 0.9,
+    vip80:(price) => price * 0.8,
+    fullReduction:(price) => price > 100 ?  price -20 : price,
+}
+
+class ShoppingCart {
+    constructor(discount: discountStrategies.none){
+        this.items = []
+        this.discount =  discount
+    }
+
+    add(items){
+        this.items.push(item)
+    }
+    remove(itemId){
+        this.items = this.items.filter((item)=> item.id !== itemId)
+    }
+    get getPrice(){
+        return this.items.reduce((sum,item)=> sum += item.price,0)
+    }
+    get  totalPrice(){
+        return this.discount(this.getPrice())
+    }
+}
+```
