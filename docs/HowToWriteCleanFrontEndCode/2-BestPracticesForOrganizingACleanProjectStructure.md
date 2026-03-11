@@ -193,3 +193,135 @@ class ShoppingCart {
     }
 }
 ```
+
+LSP(里氏替换原则) Liskov subsititution Principle
+
+所用引用基类别的地方必须能够透明地使用其子类别的对象
+> 子类别应该可以替换其父类别并且不会破坏系统的正确性
+> 子类应该有基类的一切特点
+> 行为设计，父类的每一个行为，子类是否都能以完全相同的方式完成，如果子类需要改变，即不符合 liskov subsititution principle 原则
+> 契约约束，即父类的限制，子类不能进行修改
+> [LSP](https://zhuanlan.zhihu.com/p/268574641)
+
+```javascript
+class Shape {
+    area(){
+        throw new Error("需要实现此方法");
+    }
+}
+class Rectangle extends Shape{
+    constructor(width,height){
+        this.width = width
+        this.height = height
+    }
+    set_height(height){
+        this.height = height
+    }
+    set_width(width){
+         this.width = width
+    }
+    area(){
+        return this.width * this.height
+    }
+}
+// 不应该继承Rectangle  extends Rectangle(error)
+class Square extends Shape{
+     constructor(width,height){
+        super()
+        this.width = width
+        this.height = height
+    }
+    set_height(height){
+        this.width = height
+        this.height = height
+    }
+    set_width(width){
+        this.height= width
+         this.width = width
+    }
+}
+```
+
+ISP(介面隔离原则) interface Segregation Principle
+
+interface segregation principle
+> 客户端不应该被迫依赖于它不使用的接口
+> 接口应该被拆分更小更具体的部分
+> 多小优于一大
+> 高内聚
+> 低耦合
+> 灵活性
+
+```javascript
+class Machine {
+    constructor(){
+
+    }
+    
+    print(){
+        console.log('print')
+    }
+
+    scan(){
+        console.log('scan')
+    }
+
+    fax(){
+        console.log('fax')
+    }
+}
+
+
+class MultiFunctionPrinter extends Machine {
+     constructor(){
+
+    }
+    
+    print(){
+        console.log('print')
+    }
+
+    scan(){
+        console.log('scan')
+    }
+
+    fax(){
+        console.log('fax')
+    }
+}
+
+// 1. 定义细粒度的行为（类似于拆分接口）
+const canPrint = {
+    print() { console.log('Printing...'); }
+};
+
+const canScan = {
+    scan() { console.log('Scanning...'); }
+};
+
+const canFax = {
+    fax() { console.log('Faxing...'); }
+};
+
+// 2. 根据需要组合功能
+class OldPrinter {
+    constructor() {
+        // 只具备打印功能
+        Object.assign(this, canPrint);
+    }
+}
+
+class MultiFunctionPrinter {
+    constructor() {
+        // 具备全套功能
+        Object.assign(this, canPrint, canScan, canFax);
+    }
+}
+
+// 3. 甚至可以创建一个只负责扫码的设备
+class Photocopier {
+    constructor() {
+        Object.assign(this, canPrint, canScan);
+    }
+}
+```
