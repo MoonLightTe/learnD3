@@ -324,4 +324,58 @@ class Photocopier {
         Object.assign(this, canPrint, canScan);
     }
 }
+// interface segregation principle
+```
+
+DIP(依赖反转原则) dependency inversion principle
+高层模块不应该依赖低层模块，两者都应该依赖于抽象。
+通过介面或抽象类别进行交互
+何谓高层次模组、何谓低层次模组？ 在软件系统中，我们常会区分系统的不同层次，例如资料存取层、商业逻辑层、介面层等，资料存取层可能包含了一些和资料库沟通的代码，而商业逻辑层则使用资料存取层中提供的方法来操作资料。在这种情况下，商业逻辑层可以被视为高层次模组，因为它使用了低层次模组的服务。
+
+```javascript
+class Logger {
+    log(str){
+        console.log(str)
+    }
+}
+
+class User{
+    constructor(){
+        this.logger = new Logger()
+    }
+
+    register(username){
+      this.logger.log('username:`${username}`')  
+    }
+}
+IOC inversion of control 控制反转
+通过转进来的log来控制使用哪种打印方法
+
+// 1. 抽象/契约：在 JS 中虽然没有 interface，但我们通过“鸭子类型”来达成默契
+// 只要对象有 log 方法，它就是个好的 Logger
+
+class FileLogger {
+    log(str) { console.log(`Writing to file: ${str}`); }
+}
+
+class ConsoleLogger {
+    log(str) { console.log(`Console: ${str}`); }
+}
+
+// 2. 高层模块：不再 new，而是接收注入
+class User {
+    constructor(logger) {
+        // 依赖倒置：User 依赖于传入的抽象对象
+        this.logger = logger;
+    }
+
+    register(username) {
+        this.logger.log(`Registering user: ${username}`);
+    }
+}
+
+// 3. 在“组装层”决定使用哪种细节
+const logger = new ConsoleLogger(); 
+const user = new User(logger); // 将具体实现注入进去
+user.register('Jack');
 ```
