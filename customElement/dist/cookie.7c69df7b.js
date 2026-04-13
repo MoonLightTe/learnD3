@@ -125,6 +125,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.URL = exports.Cookie = void 0;
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 function _defineProperties(e, r) { for (var t = 0; t < r.length; t++) { var o = r[t]; o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o); } }
 function _createClass(e, r, t) { return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", { writable: !1 }), e; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
@@ -145,21 +151,205 @@ var URL = exports.URL = /*#__PURE__*/function () {
     value: function resetValue() {
       this.href = null;
       this.protocol = null;
+      this.hash = null;
+      this.search = null;
+      this.username = null;
+      this.password = null;
+      this.host = null;
+      this.hostname = null;
+      this.port = null;
     }
+
+    // 标准url组成 scheme://authority/path?query#fragment
   }, {
     key: "initUrl",
     value: function initUrl(url) {
-      this.href = url;
-      this.protocol = this.getProtocol(url);
+      this.href = String(url || "");
+      var _this$splitHash = this.splitHash(this.href),
+        hash = _this$splitHash.hash,
+        noHash = _this$splitHash.rest;
+      var _this$splitSeach = this.splitSeach(noHash),
+        search = _this$splitSeach.search,
+        noHashQS = _this$splitSeach.rest;
+      var _this$splitProtocol = this.splitProtocol(noHashQS),
+        protocol = _this$splitProtocol.protocol,
+        afterScheme = _this$splitProtocol.rest;
+      console.log("🚀 ~ URL ~ initUrl ~ afterScheme:", afterScheme);
+      // authority / pathname
+      var _this$splitAuthority = this.splitAuthority(afterScheme),
+        authority = _this$splitAuthority.authority,
+        pathname = _this$splitAuthority.pathname;
+
+      // userinfo
+      var _this$parseUserinfo = this.parseUserinfo(authority),
+        username = _this$parseUserinfo.username,
+        password = _this$parseUserinfo.password,
+        hostport = _this$parseUserinfo.hostport;
+
+      // host / port
+      var _this$parseHostPort = this.parseHostPort(hostport),
+        hostname = _this$parseHostPort.hostname,
+        port = _this$parseHostPort.port;
+
+      // host + origin
+      var _this$buildOrigin = this.buildOrigin(protocol, hostname, port),
+        host = _this$buildOrigin.host,
+        origin = _this$buildOrigin.origin;
+      this.hash = hash;
+      this.search = search;
+      this.protocol = protocol;
+      this.pathname = pathname;
+      this.username = username;
+      this.password = password;
+      this.hostname = hostname;
+      this.port = port;
+      this.host = host;
+      this.origin = origin;
     }
+    // 拆分 authority 和 pathname
+  }, {
+    key: "splitAuthority",
+    value: function splitAuthority(url) {
+      if (!url.startsWith("//")) {
+        return {
+          authority: "",
+          pathname: s || "/"
+        };
+      }
+      var s = url.slice(2); // 去掉 //
+      var m = s.match(/^([^\/?#]*)/);
+      var authority = m ? m[1] : "";
+      var pathname = s.slice(authority.length) || "/";
+      return {
+        authority: authority,
+        pathname: pathname
+      };
+    }
+  }, {
+    key: "parseUserinfo",
+    value: function parseUserinfo(authority) {
+      var atIdx = authority.lastIndexOf("@");
+      if (atIdx === -1) {
+        return {
+          username: null,
+          password: null,
+          hostport: authority
+        };
+      }
+      var userinfo = authority.slice(0, atIdx);
+      var hostport = authority.slice(atIdx + 1);
+      var _userinfo$split = userinfo.split(":"),
+        _userinfo$split2 = _slicedToArray(_userinfo$split, 2),
+        u = _userinfo$split2[0],
+        p = _userinfo$split2[1];
+      return {
+        username: u ? decodeURIComponent(u) : null,
+        password: p ? decodeURIComponent(p) : null,
+        hostport: hostport
+      };
+    }
+  }, {
+    key: "parseHostPort",
+    value: function parseHostPort(hostport) {
+      if (!hostport) {
+        return {
+          hostname: null,
+          port: null
+        };
+      }
+      // ipv6
+      if (hostport.startsWith("[")) {
+        var idx = hostport.indexOf("]");
+        if (idx === -1) {
+          return {
+            hostname: hostport,
+            port: null
+          };
+        }
+        return {
+          hostname: hostport.slice(1, idx),
+          port: hostport.length > idx + 2 ? hostport.slice(idx + 2) : null
+        };
+      }
+      // const lastColon = hostport.lastIndexOf(":");
+      // if (lastColon > -1 && hostport.indexOf(":") === lastColon) {
+      //   return {
+      //     hostname: hostport.slice(0, lastColon) || null,
+      //     port: hostport.slice(lastColon + 1) || null,
+      //   };
+      // }
+      // 非 IPv6：直接找冒号
+      var colonIdx = hostport.lastIndexOf(":");
+      if (colonIdx !== -1) {
+        var potentialPort = hostport.slice(colonIdx + 1);
+        // 验证端口是否合法（纯数字 0-65535）
+        if (/^\d+$/.test(potentialPort) && Number(potentialPort) <= 65535) {
+          return {
+            hostname: hostport.slice(0, colonIdx) || null,
+            port: potentialPort
+          };
+        }
+      }
+      return {
+        hostname: hostport,
+        port: null
+      };
+    }
+
+    // 4. 组装 host 和 origin（纯计算，不依赖 this）
+  }, {
+    key: "buildOrigin",
+    value: function buildOrigin(protocol, hostname, port) {
+      var host = hostname ? port ? "".concat(hostname, ":").concat(port) : hostname : null;
+      var origin = protocol && host ? "".concat(protocol, "://").concat(host) : null;
+      return {
+        host: host,
+        origin: origin
+      };
+    }
+  }, {
+    key: "splitProtocol",
+    value: function splitProtocol(url) {
+      var protocol = this.getProtocol(url);
+      var rest = protocol ? url.slice(protocol.length + 1) : url;
+      return {
+        protocol: protocol,
+        rest: rest
+      };
+    }
+  }, {
+    key: "splitSeach",
+    value: function splitSeach(url) {
+      var qIdx = url.indexOf("?");
+      var search = qIdx === -1 ? "" : url.slice(qIdx);
+      var rest = qIdx === -1 ? url : url.slice(0, qIdx);
+      return {
+        search: search,
+        rest: rest
+      };
+    }
+  }, {
+    key: "splitHash",
+    value: function splitHash(url) {
+      var hash = this.getHash(url);
+      var idxHash = url.indexOf("#");
+      var rest = idxHash === -1 ? url : url.slice(0, idxHash);
+      return {
+        hash: hash,
+        rest: rest
+      };
+    }
+
     // 提取HASH
   }, {
     key: "getHash",
     value: function getHash(url) {
-      if (typeof url !== 'string') return null;
-      var idx = url.indexOf('#');
+      if (typeof url !== "string") return null;
+      var idx = url.indexOf("#");
       if (idx === -1) return null;
-      var fragment = url.slice(idx + 1).replace();
+      var fragment = url.slice(idx + 1).replace(/[\u0000-\u001F\u007F-\u009F]+/g, "").trim();
+      if (!fragment) return null;
+      return encodeURIComponent(fragment).replace(/%2F/gi, "/").replace(/%3A/gi, ":").replace(/%3F/gi, "?");
     }
     // 协议
   }, {
@@ -176,6 +366,8 @@ var URL = exports.URL = /*#__PURE__*/function () {
     value: function toString() {}
   }]);
 }();
+var ownURL = new URL("https://www.baidu.com:8080?a=1&b=2#ha sh");
+console.log("🚀 ~ ownURL:", ownURL);
 },{}],"../../../../.nvm/versions/node/v22.14.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
