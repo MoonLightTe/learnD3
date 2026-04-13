@@ -191,3 +191,59 @@ class Menu {
 面对对象编程优势
 - 有数据有方法
 - 复用性更强
+- 有上下文
+- 解决复杂问题
+  
+需求
+我们需要实现一套简单的低代码大屏编辑器
+- 物料区 展示预制的图形元素
+- 画布区 使用canvas进行图形绘制，支持选中画布中的图形并进行移动，支持键盘删除图形
+- 属性展示区 展示选中的图形对象的属性，并修改这些属性，修改后画布区会同步更新效果
+- 支持保存画布数据，支持根据保存的数据重绘画布
+>  面对一个复杂事物，面对对象的思维
+> 1.识别核心事物
+> 2.为这些事物定义清晰的能力接口
+> 3.将每个事物实现为一个独立的，自包含的模块
+> 4.最后，像搭积木或组装电脑一样
+
+思路 
+存在一个json 是渲染数据和记录节点的数据
+
+核心事物 物料区 画布区 就是复杂重绘 属性展示区
+
+图片节点 node类
+> 父类存在一些通用方法，子类实现特殊的方法
+
+
+graphView 类
+- canvas 的创建
+- 鼠标事件的注册
+- 键盘事件的注册
+> 鼠标事件的学习
+>
+> mousedown 鼠标按下
+> mouseup 鼠标抬起
+> click 单击
+> dbclick 双击
+> contextmenu 右键点击
+>
+> 触发顺序 mousedown - mouseup -click - dbclick
+>  mousedown - mouseup -contextmenu
+>
+> 移动事件
+> mousemove - 鼠标移动时触发
+> mouseover - 当鼠标进入元素时触发
+> mouseout - 当鼠标离开元素时触发
+> mouseenter -进入不冒泡版本
+> mouseleave -离开不冒泡版本
+> 鼠标移入时 mouseover -> mouseenter -> mousemove
+> 鼠标移出时 mousemove -> mouseleave -> mouseout
+>
+> 鼠标事件对象
+> 位置属性
+> screenX/Y 表示鼠标位置相对于屏幕左上角的水平/垂直坐标
+> clientX/Y 表示鼠标指针在文档可视区域中水平和垂直坐标
+> pageX/Y  表示鼠标位置与文档左侧/上侧边缘的距离。
+> MouseEvent.offsetX/Y 表示鼠标位置与目标节点左/上侧的padding边缘的水平距离。
+> 
+
