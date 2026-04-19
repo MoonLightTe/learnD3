@@ -1,6 +1,6 @@
 import Node from "./node";
 
-export default class CricleNODE extends Node {
+export default class CricleNode extends Node {
   constructor({ graphView, dataModel, id, attributes = {} }) {
     super({ graphView, dataModel, id, attributes });
     this.type = "circle";
