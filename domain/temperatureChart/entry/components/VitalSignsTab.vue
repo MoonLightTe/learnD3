@@ -10,6 +10,7 @@
       :form-data="formData"
       :template-config="templateConfig"
       @change="$emit('change')"
+      @label-change="payload => $emit('label-change', payload)"
     />
   </div>
 </template>

@@ -8,7 +8,7 @@
       :disabled="mark === '※'"
       @input="handleInput"
     />
-    <el-select :value="mark" size="mini" style="width:90px" @change="handleMarkChange">
+    <el-select :value="mark" size="mini" style="width:120px" @change="handleMarkChange">
       <el-option v-for="m in marks" :key="m.value" :label="m.label" :value="m.value" />
     </el-select>
     <span v-if="previewText" class="urine-preview">{{ previewText }}</span>

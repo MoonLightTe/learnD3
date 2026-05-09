@@ -87,7 +87,7 @@ function getSurgeryDates(renderData) {
 
 // 从 template.json bottomKeys 派生，统一为 { name, key, splitAmPm } 结构
 export const BOTTOM_KEYS = (TEMPLATE_CONFIG.bottomKeys || []).map(function (item) {
-  return { name: item.name, key: item.typeCode, splitAmPm: item.splitAmPm || false }
+  return { name: item.name, key: item.typeCode, splitAmPm: item.splitAmPm || false, customLabel: item.customLabel || false }
 }).concat(
   // fallback: 如果 bottomKeys 为空，从 nonTimepoint 派生
   !TEMPLATE_CONFIG.bottomKeys || TEMPLATE_CONFIG.bottomKeys.length === 0

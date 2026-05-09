@@ -18,6 +18,7 @@
         </el-checkbox-group>
       </div>
       <div class="toolbar-right">
+        <!-- <el-button size="small" @click="$emit('sync')">同步数据</el-button> -->
         <el-button size="small" @click="$emit('cancel')">取消</el-button>
         <el-button size="small" type="primary" @click="handleBatchSave">保存</el-button>
       </div>
@@ -59,19 +60,19 @@
         <table v-else class="batch-table">
           <thead>
             <tr>
-              <th style="width:50px">操作</th>
-              <th style="width:50px">床号</th>
-              <th style="width:50px">姓名</th>
-              <th style="width:60px">住院日</th>
-              <th style="width:55px">术后天</th>
+              <th class="col-action">操作</th>
+              <th class="col-bed">床号</th>
+              <th class="col-name">姓名</th>
+              <th class="col-hosp">住院日</th>
+              <th class="col-surgery">术后天</th>
               <th v-for="tp in selectedTimepoints" :key="tp" class="timepoint-th">
                 {{ tp }}
                 <div class="sub-cols">
                   <span v-for="row in allRowConfigs" :key="row.key" class="sub-col">{{ row.label }}</span>
                 </div>
               </th>
-              <th v-for="np in nonTimepointConfigs" :key="'np-' + np.key" style="width:120px">{{ np.label }}</th>
-              <th v-for="ci in customConfigs" :key="'ci-' + ci.key" style="width:100px">{{ ci.label }}</th>
+              <th v-for="np in nonTimepointConfigs" :key="'np-' + np.key" style="width:160px">{{ np.label }}</th>
+              <th v-for="ci in customConfigs" :key="'ci-' + ci.key" style="width:140px">{{ ci.label }}</th>
             </tr>
           </thead>
           <tbody>
@@ -85,7 +86,7 @@
               <td class="cell-center">{{ patient.postOpDays || '' }}</td>
               <td v-for="tp in selectedTimepoints" :key="tp" class="batch-cell">
                 <div class="sub-cells">
-                  <div v-for="row in allRowConfigs" :key="row.key" class="sub-cell">
+                  <div v-for="row in allRowConfigs" :key="row.key" class="sub-cell-inline">
                     <component
                       :is="getComponent(row.component)"
                       :form-data="getPatientForm(patient.id)"
@@ -110,6 +111,15 @@
                   v-else-if="np.component === 'StoolInlineRow'"
                   :form-data="getPatientForm(patient.id)"
                   :row-config="np"
+                  @change="handleDataChange"
+                />
+                <!-- 尿量 -->
+                <urine-cell
+                  v-else-if="np.component === 'UrineCell'"
+                  :value="getNpVal(patient.id, np.key, 'value', '')"
+                  :mark="getNpVal(patient.id, np.key, 'mark', '')"
+                  @input="val => setNestedValue(patient.id, np.key, 'value', val)"
+                  @mark-change="val => setNestedValue(patient.id, np.key, 'mark', val)"
                   @change="handleDataChange"
                 />
                 <!-- 输入+下拉通用组件 -->
@@ -150,6 +160,7 @@
                   :options="ci.options || []"
                   :value-placeholder="ci.label"
                   @change="handleDataChange"
+                  @label-change="$emit('label-change', $event)"
                 />
               </td>
             </tr>
@@ -157,15 +168,6 @@
         </table>
       </div>
     </div>
-
-    <!-- 预览弹窗 -->
-    <el-dialog
-      :title="'预览 — ' + (previewPatient_data.name || '')"
-      :visible.sync="previewVisible"
-      width="520px"
-    >
-      <div :id="'batch-preview-' + (previewPatient_data.id || 'empty')" class="preview-container"></div>
-    </el-dialog>
   </div>
 </template>
 
@@ -177,6 +179,7 @@ import RespirationCell from './cells/RespirationCell.vue'
 import BloodPressureRow from './BloodPressureRow.vue'
 import StoolInlineRow from './StoolInlineRow.vue'
 import FluidInput from './FluidInput.vue'
+import UrineCell from './UrineCell.vue'
 import InputWithSelect from './cells/InputWithSelect.vue'
 import NpSimpleInput from './cells/NpSimpleInput.vue'
 import CustomItem from './cells/CustomItem.vue'
@@ -205,6 +208,7 @@ export default {
     BloodPressureRow: BloodPressureRow,
     StoolInlineRow: StoolInlineRow,
     FluidInput: FluidInput,
+    UrineCell: UrineCell,
     InputWithSelect: InputWithSelect,
     NpSimpleInput: NpSimpleInput,
     CustomItem: CustomItem
@@ -219,9 +223,7 @@ export default {
       searchText: '',
       selectedTimepoints: [TEMPLATE_CONFIG.timepoints[0]],
       selectedPatientIds: [],
-      patientForms: {},
-      previewVisible: false,
-      previewPatient_data: {}
+      patientForms: {}
     }
   },
   computed: {
@@ -340,8 +342,6 @@ export default {
     },
 
     previewPatient: function (patient) {
-      this.previewPatient_data = patient
-      this.previewVisible = true
       this.$emit('preview', patient)
     },
 
@@ -441,7 +441,6 @@ export default {
   padding: 48px 0;
 }
 .batch-table {
-  width: 100%;
   border-collapse: collapse;
   font-size: 12px;
 }
@@ -452,6 +451,11 @@ export default {
   font-weight: 500;
   text-align: center;
 }
+.col-action { width: 65px; }
+.col-bed { width: 65px; }
+.col-name { width: 80px; }
+.col-hosp { width: 80px; }
+.col-surgery { width: 70px; }
 .batch-table td {
   padding: 4px;
   border: 1px solid #eee;
@@ -459,12 +463,14 @@ export default {
   vertical-align: middle;
 }
 .timepoint-th {
-  min-width: 220px;
+  width: 500px;
+  min-width: 500px;
 }
 .sub-cols {
   display: flex;
   gap: 1px;
   margin-top: 4px;
+  justify-content: space-around;
 }
 .sub-col {
   flex: 1;
@@ -474,14 +480,12 @@ export default {
 }
 .sub-cells {
   display: flex;
-  flex-direction: column;
   gap: 2px;
+  align-items: center;
 }
-.sub-cell {
-  width: 100%;
-  border-bottom: 1px dashed #eee;
-  padding: 2px 0;
-  &:last-child { border-bottom: none; }
+.sub-cell-inline {
+  flex: 1;
+  min-width: 0;
 }
 .batch-cell {
   text-align: center;
@@ -492,10 +496,5 @@ export default {
 }
 .cell-center {
   text-align: center;
-}
-.preview-container {
-  width: 100%;
-  min-height: 200px;
-  overflow: auto;
 }
 </style>

@@ -1,16 +1,16 @@
 <template>
   <div class="input-with-select">
-    <input
+    <el-input
+      v-model="localValue"
+      size="mini"
       class="field-input"
-      :disabled="isInputDisabled"
-      :value="innerValue"
       :placeholder="inputPlaceholder"
-      inputmode="decimal"
+      :disabled="isInputDisabled"
       @input="handleInput"
     />
     <span v-if="unit" class="field-unit">{{ unit }}</span>
     <el-select
-      :value="innerSelect"
+      v-model="localSelect"
       size="mini"
       class="field-select"
       :placeholder="selectPlaceholder"
@@ -34,6 +34,12 @@ export default {
     unit: { type: String, default: '' },
     disableInputOn: { type: String, default: '' }
   },
+  data: function () {
+    return {
+      localValue: '',
+      localSelect: ''
+    }
+  },
   computed: {
     npData: function () {
       var np = this.formData && this.formData.nonTimepoint
@@ -41,19 +47,26 @@ export default {
       if (!np || !key) return {}
       return np[key] || {}
     },
-    innerValue: function () {
-      return this.npData.value || ''
-    },
-    innerSelect: function () {
-      return this.npData.selectValue || ''
-    },
     isInputDisabled: function () {
-      return this.disableInputOn && this.innerSelect === this.disableInputOn
+      if(!this.disableInputOn) return false
+      return this.disableInputOn && this.localSelect === this.disableInputOn
     },
     disabledLabel: function () {
       if (this.isInputDisabled) return this.disableInputOn
       return ''
     }
+  },
+  watch: {
+    'npData.value': function (v) {
+      this.localValue = v || ''
+    },
+    'npData.selectValue': function (v) {
+      this.localSelect = v || ''
+    }
+  },
+  created: function () {
+    this.localValue = this.npData.value || ''
+    this.localSelect = this.npData.selectValue || ''
   },
   methods: {
     ensureNp: function () {
@@ -63,18 +76,14 @@ export default {
       }
       return this.formData.nonTimepoint[key]
     },
-    handleInput: function (e) {
-      this.ensureNp().value = e.target.value
+    handleInput: function (val) {
+      this.$set(this.ensureNp(), 'value', val)
       this.$emit('change')
     },
     handleSelect: function (val) {
-      this.ensureNp().selectValue = val
+      this.localSelect = val
+      this.$set(this.ensureNp(), 'selectValue', val)
       this.$emit('change')
-    },
-    getFocusableInputs: function () {
-      var el = this.$el
-      if (!el) return []
-      return Array.from(el.querySelectorAll('input:not([disabled]), select:not([disabled])'))
     }
   }
 }
@@ -87,38 +96,14 @@ export default {
   gap: 4px;
 }
 .field-input {
-  padding: 4px 6px;
-  border: 1px solid transparent;
-  text-align: center;
-  font-size: 13px;
-  border-radius: 3px;
-  background: transparent;
-  outline: none;
-  width: 100px;
-}
-.field-input:focus {
-  background: #fff;
-  border-color: #1a73e8;
-}
-.field-input::placeholder {
-  color: #ddd;
-}
-.field-input:disabled {
-  background: #f5f5f5;
-  color: #bbb;
+  width: 120px;
 }
 .field-unit {
   font-size: 11px;
   color: #999;
 }
 .field-select {
-  width: 80px;
-  /deep/ .el-input__inner {
-    padding: 0 20px 0 6px;
-    font-size: 11px;
-    height: 26px;
-    line-height: 26px;
-  }
+  width: 120px;
 }
 .disabled-label {
   font-size: 12px;

@@ -69,6 +69,7 @@
             :form-data="formData"
             :template-config="templateConfig"
             @change="handleFormChange"
+            @label-change="handleCustomLabelChange"
           />
         </div>
 
@@ -104,6 +105,8 @@
       @save="handleBatchSave"
       @change="hasUnsaved = true"
       @preview="handleBatchPreview"
+      @label-change="handleCustomLabelChange"
+      @sync="handleSync"
     />
     </template>
 
@@ -114,8 +117,8 @@
     <el-dialog
       :title="'预览 — ' + (batchPreviewPatient.name || '')"
       :visible.sync="batchPreviewVisible"
-      width="1060px"
-      top="4vh"
+      width="720px"
+      top="5vh"
       @opened="renderBatchPreview"
     >
       <div class="batch-preview-body" :id="'batchPreviewChart'"></div>
@@ -538,6 +541,50 @@ export default {
       this.$message.info('同步功能待对接后端 API')
     },
 
+    handleCustomLabelChange: function (payload) {
+      var key = payload.key
+      var label = payload.label
+      // 更新 templateConfig.customItems
+      var items = this.templateConfig.customItems || []
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].key === key) {
+          items[i].label = label
+          break
+        }
+      }
+      // 更新 templateConfig.bottomKeys 对应项的 name
+      var bottomKeys = this.templateConfig.bottomKeys || []
+      for (var j = 0; j < bottomKeys.length; j++) {
+        if (bottomKeys[j].typeCode === key || bottomKeys[j].customLabel) {
+          // 按 typeCode 匹配
+          var customItems = this.templateConfig.customItems || []
+          for (var ci = 0; ci < customItems.length; ci++) {
+            if (customItems[ci].key === key && bottomKeys[j].typeCode === customItems[ci].typeCode) {
+              bottomKeys[j].name = label
+              break
+            }
+          }
+        }
+      }
+      // 同步更新 TEMPLATE_CONFIG（被 const/index.js 的 BOTTOM_KEYS 引用的源对象）
+      TEMPLATE_CONFIG.customItems = items
+      TEMPLATE_CONFIG.bottomKeys = bottomKeys
+      // 更新 renderData types 中所有该 key 的 customName
+      if (this.renderData && this.renderData.types) {
+        var typeCode = null
+        for (var ti = 0; ti < items.length; ti++) {
+          if (items[ti].key === key) { typeCode = items[ti].typeCode; break }
+        }
+        if (typeCode) {
+          this.renderData.types.forEach(function (t) {
+            if (t.typeCode === typeCode) t.customName = label
+          })
+        }
+      }
+      // 触发重新渲染
+      this.schedulePreview()
+    },
+
     handleBatchSave: function (batchData) {
       this.$message.success('批量保存成功（共 ' + batchData.patientIds.length + ' 名患者）')
       this.hasUnsaved = false
@@ -758,8 +805,12 @@ export default {
 
 /* 批量预览弹窗 */
 .batch-preview-body {
-  min-height: 500px;
-  overflow: auto;
+  max-height: 75vh;
+  overflow: hidden;
+}
+.batch-preview-body svg {
+  width: 100%;
+  height: auto;
 }
 
 /* 打印样式 */

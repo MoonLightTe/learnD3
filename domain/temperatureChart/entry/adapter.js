@@ -222,9 +222,11 @@ export function formToRender(formData, patientInfo, weekDates, existingRenderDat
         break
       case '020':
         item.typeValue = np.custom_1 ? assembleCustomItem(np.custom_1) : null
+        if (np.custom_1 && np.custom_1.label) item.customName = np.custom_1.label
         break
       case '021':
         item.typeValue = np.custom_2 ? assembleCustomItem(np.custom_2) : null
+        if (np.custom_2 && np.custom_2.label) item.customName = np.custom_2.label
         break
     }
   })
@@ -270,14 +272,14 @@ function assembleBloodPressure(bp) {
 
 // --- 尿量 ---
 function parseUrineVolume(typeValue) {
-  if (!typeValue) return { value: '', selectValue: '' }
+  if (!typeValue) return { value: '', mark: '' }
   var str = String(typeValue)
-  if (str === '※') return { value: '', selectValue: '※' }
+  if (str === '※') return { value: '', mark: '※' }
   if (str.indexOf('/') > -1) {
     var parts = str.split('/')
-    return { value: parts[0] || '', selectValue: parts[1] || '' }
+    return { value: parts[0] || '', mark: parts[1] || '' }
   }
-  return { value: str, selectValue: '' }
+  return { value: str, mark: '' }
 }
 
 function assembleUrineVolume(data) {
@@ -351,7 +353,7 @@ function assembleSkinTest(data) {
 
 // --- 自定义项（名称可编辑） ---
 function parseCustomItem(item) {
-  return { label: '', value: item.typeValue || '' }
+  return { label: item.customName || '', value: item.typeValue || '' }
 }
 function assembleCustomItem(data) {
   if (!data) return null

@@ -65,17 +65,18 @@ export default {
     ensureNp: function () {
       var key = this.rowConfig.key
       if (!this.formData.nonTimepoint[key]) {
-        this.$set(this.formData.nonTimepoint, key, { label: this.rowConfig.label || '' })
+        this.$set(this.formData.nonTimepoint, key, { label: this.rowConfig.label || '', value: '' })
       }
       return this.formData.nonTimepoint[key]
     },
     handleLabelChange: function (e) {
-      this.ensureNp().label = e.target.value
+      this.$set(this.ensureNp(), 'label', e.target.value)
       this.$emit('change')
+      this.$emit('label-change', { key: this.rowConfig.key, label: e.target.value })
     },
     handleValueChange: function (val) {
       var raw = val && val.target ? val.target.value : val
-      this.ensureNp().value = raw
+      this.$set(this.ensureNp(), 'value', raw)
       this.$emit('change')
     }
   }
@@ -127,7 +128,7 @@ export default {
   color: #999;
 }
 .custom-select {
-  width: 100px;
+  width: 120px;
   /deep/ .el-input__inner {
     padding: 0 20px 0 6px;
     font-size: 11px;

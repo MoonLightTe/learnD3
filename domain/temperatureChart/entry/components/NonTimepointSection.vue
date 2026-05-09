@@ -34,6 +34,15 @@
               :disable-input-on="row.disableInputOn || ''"
               @change="$emit('change')"
             />
+            <!-- 尿量 -->
+            <urine-cell
+              v-else-if="row.component === 'UrineCell'"
+              :value="getNpVal(row.key, 'value', '')"
+              :mark="getNpVal(row.key, 'mark', '')"
+              @input="val => setNestedValue(row.key, 'value', val)"
+              @mark-change="val => setNestedValue(row.key, 'mark', val)"
+              @change="$emit('change')"
+            />
             <!-- 体液入量 -->
             <fluid-input
               v-else-if="row.component === 'FluidInput'"
@@ -68,6 +77,7 @@
               :options="row.options || []"
               :value-placeholder="row.label"
               @change="$emit('change')"
+              @label-change="payload => $emit('label-change', payload)"
             />
           </td>
         </tr>
@@ -79,6 +89,7 @@
 <script>
 import BloodPressureRow from './BloodPressureRow.vue'
 import StoolInlineRow from './StoolInlineRow.vue'
+import UrineCell from './UrineCell.vue'
 import FluidInput from './FluidInput.vue'
 import InputWithSelect from './cells/InputWithSelect.vue'
 import NpSimpleInput from './cells/NpSimpleInput.vue'
@@ -86,7 +97,7 @@ import CustomItem from './cells/CustomItem.vue'
 
 export default {
   name: 'NonTimepointSection',
-  components: { BloodPressureRow, StoolInlineRow, FluidInput, InputWithSelect, NpSimpleInput, CustomItem },
+  components: { BloodPressureRow, StoolInlineRow, UrineCell, FluidInput, InputWithSelect, NpSimpleInput, CustomItem },
   props: {
     formData: { type: Object, required: true },
     templateConfig: { type: Object, required: true }

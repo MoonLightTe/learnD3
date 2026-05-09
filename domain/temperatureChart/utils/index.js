@@ -1022,9 +1022,10 @@ function drawTopVerticalLine(svg, viewConfig) {
 
 function drawBottomLineData(svg, viewConfig) {
   const g = getG(svg, viewConfig);
-  // 绘制行分隔横线
+  // 绘制行分隔横线（含最后一行的结束边框）
+  var bottomLineCount = BOTTOM_KEYS.length + 1;
   g.selectAll("line")
-    .data([...BOTTOM_KEYS])
+    .data(d3.range(bottomLineCount))
     .join("line")
     .attr("x1", 0)
     .attr("y1", (d, i) => viewConfig.bottomKeysPosStart + (i + 2) * LINE_HEIGHT)
@@ -1037,7 +1038,7 @@ function drawBottomLineData(svg, viewConfig) {
 
   const textArr = BOTTOM_KEYS;
   const repeatArr = d3.range(8);
-  textArr.map(function ({ key, name, splitAmPm }, index) {
+  textArr.map(function ({ key, name, splitAmPm, customLabel }, index) {
     // 血压行：每天格子中间加竖线分隔上午/下午
     if (splitAmPm) {
       var yTop = viewConfig.bottomKeysPosStart + (index + 2) * LINE_HEIGHT;
@@ -1053,11 +1054,22 @@ function drawBottomLineData(svg, viewConfig) {
           .attr("stroke-width", 0.5);
       }
     }
+    // 自定义项：从 typesData 读取动态 label
+    var displayName = name;
+    if (customLabel) {
+      var customItems = getTypeValue(key, viewConfig.renderData.typesData);
+      for (var ci = 0; ci < customItems.length; ci++) {
+        if (customItems[ci] && customItems[ci].customName) {
+          displayName = customItems[ci].customName;
+          break;
+        }
+      }
+    }
     g.append("g").selectAll("text").data(repeatArr).join("text")
       .attr("style", "font-size:14px")
       .attr("class", "bottomText")
       .text(function (i) {
-        if (i === 0) return name;
+        if (i === 0) return displayName;
         return getTypeValue(key, viewConfig.renderData.typesData)[i - 1]?.typeValue;
       })
       .attr("x", (i) => viewConfig.step * i + textLeftMargin)
