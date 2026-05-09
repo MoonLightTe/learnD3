@@ -18,6 +18,13 @@ import {
   INFO_KEYS,
 } from "../const/index";
 import ViewConfig from "./viewConfig";
+import TEMPLATE_CONFIG from "../entry/template.json";
+
+// 事件类型 → 颜色映射
+var EVENT_COLOR_MAP = {};
+(TEMPLATE_CONFIG.events || []).forEach(function (evt) {
+  EVENT_COLOR_MAP[evt.type] = evt.color;
+});
 
 const options = {
   x: (d) => d.year,
@@ -33,13 +40,13 @@ const options = {
   duration: 5000, // for the intro animation; 0 to disable
 };
 
-export function init(data) {
+export function init(data, containerId, containerEl) {
   //第一步处理数据
   const groupData = groupTemperatureData(data);
   Reflect.set(options, "renderData", groupData);
   const chart = ConnectedScatterplot(options);
-  document.getElementById("temperatureChart").appendChild(chart);
-  downloadPNG(document.getElementById("printsvg"))
+  const container = containerEl || document.getElementById(containerId || "chartWrapper")
+  if (container) container.appendChild(chart);
 }
 
 function ConnectedScatterplot(options) {
@@ -420,7 +427,6 @@ function drawCoolBody(svg, data, allData, viewConfig) {
     return data;
   }, {});
   const vaildData = data.filter((item) => item.value);
-  vaildData.push({ index: 11, date: "2022-03-27", value: 39 });
   console.log("🚀 ~ drawCoolBody ~ vaildData:", vaildData);
   console.log("🚀 ~ drawCoolBody ~ temArrMap:", temArrMap);
   const lineData = vaildData.filter(
@@ -542,6 +548,7 @@ function getTypeData(type, datas = [], isNumber = true) {
     return {
       index,
       date: currentItem.date,
+      times: currentItem.times || null,
       value:
         (isNumber ? +currentItem.typeValue : currentItem.typeValue) || null,
     };
@@ -1015,47 +1022,46 @@ function drawTopVerticalLine(svg, viewConfig) {
 
 function drawBottomLineData(svg, viewConfig) {
   const g = getG(svg, viewConfig);
-  // 绘制竖线
+  // 绘制行分隔横线
   g.selectAll("line")
     .data([...BOTTOM_KEYS])
     .join("line")
     .attr("x1", 0)
-    .attr("y1", (d, i) => {
-      return viewConfig.bottomKeysPosStart + (i + 2) * LINE_HEIGHT;
-    })
+    .attr("y1", (d, i) => viewConfig.bottomKeysPosStart + (i + 2) * LINE_HEIGHT)
     .attr("x2", viewConfig.contentWidth)
     .attr("y2", (d, i) => viewConfig.bottomKeysPosStart + (i + 2) * LINE_HEIGHT)
     .attr("fill", "none")
     .attr("class", "dataLine")
     .attr("stroke", viewConfig.stroke)
-    .attr("stroke-width", 1)
-    .attr("stroke-linejoin", viewConfig.strokeLinejoin)
-    .attr("stroke-linecap", viewConfig.strokeLinecap);
+    .attr("stroke-width", 1);
+
   const textArr = BOTTOM_KEYS;
   const repeatArr = d3.range(8);
-  textArr.map(({ key, name }, index) => {
-    g.append("g")
-      .selectAll("text")
-      .data(repeatArr)
-      .join("text")
+  textArr.map(function ({ key, name, splitAmPm }, index) {
+    // 血压行：每天格子中间加竖线分隔上午/下午
+    if (splitAmPm) {
+      var yTop = viewConfig.bottomKeysPosStart + (index + 2) * LINE_HEIGHT;
+      var yBottom = yTop + LINE_HEIGHT;
+      for (var d = 1; d < 8; d++) {
+        var xMid = viewConfig.step * d + viewConfig.step / 2;
+        g.append("line")
+          .attr("x1", xMid)
+          .attr("y1", yTop)
+          .attr("x2", xMid)
+          .attr("y2", yBottom)
+          .attr("stroke", viewConfig.stroke)
+          .attr("stroke-width", 0.5);
+      }
+    }
+    g.append("g").selectAll("text").data(repeatArr).join("text")
       .attr("style", "font-size:14px")
       .attr("class", "bottomText")
-      .text((i) => {
-        if (i == 0) {
-          return name;
-        } else {
-          return getTypeValue(key, viewConfig.renderData.typesData)[i - 1]
-            ?.typeValue;
-        }
+      .text(function (i) {
+        if (i === 0) return name;
+        return getTypeValue(key, viewConfig.renderData.typesData)[i - 1]?.typeValue;
       })
       .attr("x", (i) => viewConfig.step * i + textLeftMargin)
-      .attr("y", (i) => {
-        return (
-          viewConfig.bottomKeysPosStart +
-          (index + 3) * LINE_HEIGHT -
-          TEXT_MARGIN_BOTTOM
-        );
-      });
+      .attr("y", viewConfig.bottomKeysPosStart + (index + 3) * LINE_HEIGHT - TEXT_MARGIN_BOTTOM);
   });
 }
 
@@ -1154,34 +1160,49 @@ function drawTopData(svg, viewConfig) {
 }
 
 function drawSpecialText(svg, textData, viewConfig, isBottom = false) {
-  console.log("🚀 ~ drawSpecialText ~ textData:", textData);
   const g = getG(svg, viewConfig);
   g.append("g")
     .selectAll("text")
     .data(textData)
     .join("text")
-    .attr("style", "font-size: 14px;fill: red")
+    .attr("style", function (d) {
+      var eventType = d.value;
+      var cfg = getEventConfig(eventType);
+      var color = (cfg && cfg.disconnectCurve) ? "#409EFF" : (EVENT_COLOR_MAP[eventType] || "red");
+      return "font-size: 14px;fill: " + color;
+    })
     .attr("class", "mytext")
-    .html((d, i) => {
-      const texts = (d?.value || "").split("");
-      return texts
-        .map((text, i) => {
-          return `<tspan dx="${
-            i == 1 ? -14 : i == 0 ? 0 : Number(text) ? -8 : -14
-          }" dy="${20}">${text}</tspan>`;
-        })
-        .join("");
+    .html(function (d) {
+      var displayText = formatEventText(d);
+      var chars = displayText.split("");
+      return chars.map(function (ch, i) {
+        return '<tspan dx="' + (i === 0 ? 0 : (Number(ch) ? -8 : -14)) + '" dy="' + (i === 0 ? 0 : 20) + '">' + ch + '</tspan>';
+      }).join("");
     })
     .attr(
       "x",
-      (d, i) => viewConfig.step + i * viewConfig.micoStep + textLeftMargin
+      (d) => viewConfig.step + d.index * viewConfig.micoStep + textLeftMargin
     )
-    .attr("y", (d) => {
-      const texts = (d?.value || "").split("");
+    .attr("y", function (d) {
+      var displayText = formatEventText(d);
+      var chars = displayText.split("");
       return isBottom
-        ? viewConfig.bottomKeysPosStart - texts.length * LINE_HEIGHT - 6
+        ? viewConfig.bottomKeysPosStart - chars.length * LINE_HEIGHT - 6
         : viewConfig.topKeysPos - textLeftMargin;
     });
+}
+
+// 格式化事件文本："事件名丨中文时分"
+function formatEventText(d) {
+  var eventType = d.value;
+  if (!eventType) return "";
+  var cfg = getEventConfig(eventType);
+  // 手术/请假无时间
+  if (cfg && !cfg.needTime) return eventType;
+  // 有时间：拼接中文时分
+  var timeStr = d.times || "";
+  var cnTime = toChineseTime(timeStr);
+  return cnTime ? eventType + "丨" + cnTime : eventType;
 }
 
 function setPointerEvent(g, pointerObj) {
@@ -1430,4 +1451,31 @@ function downloadPNG(svgElement) {
     win.document.write(`<img src="${dataUrl}" onload="window.print();window.close()">`);
   };
   img.src = url;
+}
+
+// HH:mm → 中文时分（如 "10:22" → "十时二十二分"）
+function toChineseTime(timeStr) {
+  if (!timeStr) return "";
+  var parts = String(timeStr).split(":");
+  if (parts.length < 2) return "";
+  var h = parseInt(parts[0], 10);
+  var m = parseInt(parts[1], 10);
+  if (isNaN(h) || isNaN(m)) return "";
+  var cn = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+  function numCN(n) {
+    if (n === 0) return "";
+    if (n <= 10) return cn[n];
+    if (n < 20) return "十" + (n % 10 ? cn[n % 10] : "");
+    if (n < 100) return cn[Math.floor(n / 10)] + "十" + (n % 10 ? cn[n % 10] : "");
+    return String(n);
+  }
+  var result = numCN(h) + "时";
+  if (m > 0) result += numCN(m) + "分";
+  return result;
+}
+
+// 查找事件配置（是否需要时间、是否断开曲线等）
+function getEventConfig(eventType) {
+  var events = TEMPLATE_CONFIG.events || [];
+  return events.find(function (e) { return e.type === eventType; }) || {};
 }

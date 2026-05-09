@@ -1,0 +1,95 @@
+{
+  "timepoints": ["02:00", "06:00", "10:00", "14:00", "18:00", "22:00"],
+  "dayNumber": 7,
+  "nightTime": [2, 18, 22],
+
+  "ranges": {
+    "bodyTemperature": [35, 42],
+    "heartRate": [40, 180],
+    "pulse": [40, 180]
+  },
+
+  "rows": [
+    { "key": "temperature", "label": "体温", "typeCode": "003", "unit": "℃", "component": "InlineTemperature", "alertRange": [34, 42] },
+    { "key": "pulse", "label": "脉搏", "typeCode": "002", "unit": "次/分", "component": "InputCell", "alertRange": [20, 250] },
+    { "key": "heartRate", "label": "心率", "typeCode": "014", "unit": "次/分", "component": "InputCell", "alertRange": [20, 250] },
+    { "key": "respiration", "label": "呼吸", "typeCode": "001", "unit": "次/分", "component": "RespirationCell", "alertRange": [5, 60] }
+  ],
+
+  "nonTimepoint": [
+    { "key": "bloodPressure", "label": "血压", "typeCode": "008", "unit": "mmHg", "component": "BloodPressureRow" },
+    { "key": "stool", "label": "大便", "typeCode": "005", "unit": "次", "component": "StoolInlineRow" },
+    { "key": "urineVolume", "label": "尿量", "typeCode": "011", "unit": "ml", "component": "UrineCell" },
+    { "key": "fluidIntake", "label": "体液入量", "typeCode": "006", "unit": "ml", "component": "FluidInput" },
+    { "key": "otherOutput", "label": "其他排出量", "typeCode": "007", "unit": "ml", "component": "SimpleInput" },
+    { "key": "height", "label": "身高", "typeCode": "030", "unit": "cm", "component": "SimpleInput" },
+    { "key": "weight", "label": "体重", "typeCode": "009", "unit": "kg", "component": "WeightCell", "alertRange": [1, 300] },
+    { "key": "skinTest", "label": "皮试", "typeCode": "016", "component": "SkinTestCell" },
+    { "key": "urinationCount", "label": "小便", "typeCode": "004", "unit": "次", "component": "SimpleInput" },
+    { "key": "allergyDrug", "label": "过敏药", "typeCode": "010", "component": "SimpleInput" }
+  ],
+
+  "customItems": [
+    {
+      "key": "painScore",
+      "label": "疼痛评分",
+      "typeCode": "020",
+      "unit": "分",
+      "component": "ScoreInput",
+      "inputType": "number",
+      "options": [],
+      "alertRange": [0, 10]
+    },
+    {
+      "key": "fallRisk",
+      "label": "跌倒风险",
+      "typeCode": "021",
+      "unit": "",
+      "component": "CustomInput",
+      "inputType": "select",
+      "options": ["无", "低危", "中危", "高危"],
+      "alertRange": null
+    }
+  ],
+
+  "bottomKeys": [
+    { "name": "血压(mmHg)", "typeCode": "008", "splitAmPm": true },
+    { "name": "体液入量(ml)", "typeCode": "006" },
+    { "name": "尿量(ml)", "typeCode": "011" },
+    { "name": "大便(次)", "typeCode": "005" },
+    { "name": "小便(次)", "typeCode": "004" },
+    { "name": "身高(cm)", "typeCode": "030" },
+    { "name": "体重(kg)", "typeCode": "009" },
+    { "name": "其他排出量(ml)", "typeCode": "007" },
+    { "name": "过敏药", "typeCode": "010" },
+    { "name": "疼痛评分(分)", "typeCode": "020" },
+    { "name": "跌倒风险", "typeCode": "021" }
+  ],
+
+  "events": [
+    { "type": "入院", "color": "#409EFF", "needTime": true },
+    { "type": "转入", "color": "#9B59B6", "needTime": true },
+    { "type": "转出", "color": "#9B59B6", "needTime": true },
+    { "type": "回室", "color": "#409EFF", "needTime": true },
+    { "type": "拒测", "color": "#E6A23C", "needTime": true },
+    { "type": "请假", "color": "#E6A23C", "needTime": false },
+    { "type": "查房", "color": "#409EFF", "needTime": true },
+    { "type": "手术", "color": "#F56C6C", "needTime": false },
+    { "type": "分娩", "color": "#F56C6C", "needTime": true },
+    { "type": "出生", "color": "#409EFF", "needTime": true },
+    { "type": "转科", "color": "#9B59B6", "needTime": true, "needTargetDept": true },
+    { "type": "外出", "color": "#E6A23C", "needTime": true, "disconnectCurve": true },
+    { "type": "出院", "color": "#909399", "needTime": true },
+    { "type": "死亡", "color": "#F56C6C", "needTime": true },
+    { "type": "院外分娩", "color": "#E6A23C", "needTime": true }
+  ],
+
+  "infoKeys": [
+    { "name": "姓名", "key": "name" },
+    { "name": "入院日期", "key": "hospDate" },
+    { "name": "诊断", "key": "inDiagName" },
+    { "name": "科室", "key": "officeName" },
+    { "name": "床位号", "key": "cwh" },
+    { "name": "病案号", "key": "bah" }
+  ]
+}
