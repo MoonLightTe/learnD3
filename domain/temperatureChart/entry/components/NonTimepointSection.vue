@@ -22,13 +22,16 @@
               :row-config="row"
               @change="$emit('change')"
             />
-            <!-- 尿量 -->
-            <urine-cell
-              v-else-if="row.component === 'UrineCell'"
-              :value="getNpVal(row.key, 'value', '')"
-              :mark="getNpVal(row.key, 'mark', '')"
-              @input="val => setNestedValue(row.key, 'value', val)"
-              @mark-change="val => setNestedValue(row.key, 'mark', val)"
+            <!-- 输入+下拉通用组件 -->
+            <input-with-select
+              v-else-if="row.component === 'InputWithSelect'"
+              :form-data="formData"
+              :row-config="row"
+              :input-placeholder="row.inputPlaceholder || row.label"
+              :select-placeholder="row.selectPlaceholder || '请选择'"
+              :select-options="row.selectOptions || []"
+              :unit="row.unit || ''"
+              :disable-input-on="row.disableInputOn || ''"
               @change="$emit('change')"
             />
             <!-- 体液入量 -->
@@ -40,25 +43,7 @@
               @hours-change="val => setNestedValue(row.key, 'hours', val)"
               @change="$emit('change')"
             />
-            <!-- 体重 -->
-            <weight-cell
-              v-else-if="row.component === 'WeightCell'"
-              :value="getNpVal(row.key, 'value', '')"
-              :assist-method="getNpVal(row.key, 'assistMethod', '无')"
-              @input="val => setNestedValue(row.key, 'value', val)"
-              @assist-change="val => setNestedValue(row.key, 'assistMethod', val)"
-              @change="$emit('change')"
-            />
-            <!-- 皮试 -->
-            <skin-test-cell
-              v-else-if="row.component === 'SkinTestCell'"
-              :drug-name="getNpVal(row.key, 'drugName', '')"
-              :result="getNpVal(row.key, 'result', '')"
-              @drug-change="val => setNestedValue(row.key, 'drugName', val)"
-              @result-change="val => setNestedValue(row.key, 'result', val)"
-              @change="$emit('change')"
-            />
-            <!-- 简单数值输入（身高、其他排出量等） -->
+            <!-- 简单数值输入 -->
             <np-simple-input
               v-else
               :form-data="formData"
@@ -67,22 +52,21 @@
             />
           </td>
         </tr>
-        <!-- 自定义录入项：由 templateConfig.customItems 驱动 -->
+        <!-- 自定义录入项 -->
         <tr v-for="row in customRows" :key="row.key">
           <td class="row-label">
+            <span style="color:#1a73e8;font-size:11px">★</span>
             {{ row.label }}
             <span v-if="row.unit" class="unit">{{ row.unit }}</span>
           </td>
           <td class="np-cell" colspan="4">
-            <custom-input
+            <custom-item
               :form-data="formData"
               :row-config="row"
               :input-type="row.inputType || 'text'"
-              :label="row.label"
-              :unit="row.unit"
+              :unit="row.unit || ''"
               :options="row.options || []"
-              :value="getNpVal(row.key, 'value', '')"
-              @input="val => setNestedValue(row.key, 'value', val)"
+              :value-placeholder="row.label"
               @change="$emit('change')"
             />
           </td>
@@ -95,16 +79,14 @@
 <script>
 import BloodPressureRow from './BloodPressureRow.vue'
 import StoolInlineRow from './StoolInlineRow.vue'
-import UrineCell from './UrineCell.vue'
 import FluidInput from './FluidInput.vue'
-import WeightCell from './WeightCell.vue'
-import SkinTestCell from './SkinTestCell.vue'
+import InputWithSelect from './cells/InputWithSelect.vue'
 import NpSimpleInput from './cells/NpSimpleInput.vue'
-import CustomInput from './cells/CustomInput.vue'
+import CustomItem from './cells/CustomItem.vue'
 
 export default {
   name: 'NonTimepointSection',
-  components: { BloodPressureRow, StoolInlineRow, UrineCell, FluidInput, WeightCell, SkinTestCell, NpSimpleInput, CustomInput },
+  components: { BloodPressureRow, StoolInlineRow, FluidInput, InputWithSelect, NpSimpleInput, CustomItem },
   props: {
     formData: { type: Object, required: true },
     templateConfig: { type: Object, required: true }
@@ -155,25 +137,6 @@ export default {
 <style lang="less" scoped>
 .non-timepoint-section {
   margin-top: 0;
-}
-
-.section-separator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 0 8px;
-}
-
-.separator-line {
-  flex: 1;
-  height: 1px;
-  background: #eee;
-}
-
-.separator-text {
-  font-size: 12px;
-  color: #999;
-  font-weight: 500;
 }
 
 .np-table {

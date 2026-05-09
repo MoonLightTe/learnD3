@@ -112,13 +112,16 @@
                   :row-config="np"
                   @change="handleDataChange"
                 />
-                <!-- 尿量 -->
-                <urine-cell
-                  v-else-if="np.component === 'UrineCell'"
-                  :value="getNpVal(patient.id, np.key, 'value', '')"
-                  :mark="getNpVal(patient.id, np.key, 'mark', '')"
-                  @input="val => setNestedValue(patient.id, np.key, 'value', val)"
-                  @mark-change="val => setNestedValue(patient.id, np.key, 'mark', val)"
+                <!-- 输入+下拉通用组件 -->
+                <input-with-select
+                  v-else-if="np.component === 'InputWithSelect'"
+                  :form-data="getPatientForm(patient.id)"
+                  :row-config="np"
+                  :input-placeholder="np.inputPlaceholder || np.label"
+                  :select-placeholder="np.selectPlaceholder || '请选择'"
+                  :select-options="np.selectOptions || []"
+                  :unit="np.unit || ''"
+                  :disable-input-on="np.disableInputOn || ''"
                   @change="handleDataChange"
                 />
                 <!-- 体液入量 -->
@@ -130,24 +133,6 @@
                   @hours-change="val => setNestedValue(patient.id, np.key, 'hours', val)"
                   @change="handleDataChange"
                 />
-                <!-- 体重 -->
-                <weight-cell
-                  v-else-if="np.component === 'WeightCell'"
-                  :value="getNpVal(patient.id, np.key, 'value', '')"
-                  :assist-method="getNpVal(patient.id, np.key, 'assistMethod', '无')"
-                  @input="val => setNestedValue(patient.id, np.key, 'value', val)"
-                  @assist-change="val => setNestedValue(patient.id, np.key, 'assistMethod', val)"
-                  @change="handleDataChange"
-                />
-                <!-- 皮试 -->
-                <skin-test-cell
-                  v-else-if="np.component === 'SkinTestCell'"
-                  :drug-name="getNpVal(patient.id, np.key, 'drugName', '')"
-                  :result="getNpVal(patient.id, np.key, 'result', '')"
-                  @drug-change="val => setNestedValue(patient.id, np.key, 'drugName', val)"
-                  @result-change="val => setNestedValue(patient.id, np.key, 'result', val)"
-                  @change="handleDataChange"
-                />
                 <!-- 简单数值 -->
                 <np-simple-input
                   v-else
@@ -157,15 +142,13 @@
                 />
               </td>
               <td v-for="ci in customConfigs" :key="'ci-' + ci.key" class="batch-cell np-batch-cell">
-                <custom-input
+                <custom-item
                   :form-data="getPatientForm(patient.id)"
                   :row-config="ci"
                   :input-type="ci.inputType || 'text'"
-                  :label="ci.label"
-                  :unit="ci.unit"
+                  :unit="ci.unit || ''"
                   :options="ci.options || []"
-                  :value="getCustomVal(patient.id, ci.key, 'value', '')"
-                  @input="val => setCustomValue(patient.id, ci.key, val)"
+                  :value-placeholder="ci.label"
                   @change="handleDataChange"
                 />
               </td>
@@ -193,12 +176,10 @@ import SimpleInputCell from './cells/SimpleInputCell.vue'
 import RespirationCell from './cells/RespirationCell.vue'
 import BloodPressureRow from './BloodPressureRow.vue'
 import StoolInlineRow from './StoolInlineRow.vue'
-import UrineCell from './UrineCell.vue'
 import FluidInput from './FluidInput.vue'
-import WeightCell from './WeightCell.vue'
-import SkinTestCell from './SkinTestCell.vue'
+import InputWithSelect from './cells/InputWithSelect.vue'
 import NpSimpleInput from './cells/NpSimpleInput.vue'
-import CustomInput from './cells/CustomInput.vue'
+import CustomItem from './cells/CustomItem.vue'
 
 var COMPONENT_MAP = {
   InlineTemperature: 'InlineTemperature',
@@ -223,12 +204,10 @@ export default {
     RespirationCell: RespirationCell,
     BloodPressureRow: BloodPressureRow,
     StoolInlineRow: StoolInlineRow,
-    UrineCell: UrineCell,
     FluidInput: FluidInput,
-    WeightCell: WeightCell,
-    SkinTestCell: SkinTestCell,
+    InputWithSelect: InputWithSelect,
     NpSimpleInput: NpSimpleInput,
-    CustomInput: CustomInput
+    CustomItem: CustomItem
   },
   props: {
     date: { type: String, default: '' },
@@ -354,24 +333,6 @@ export default {
         this.$set(form.nonTimepoint, parent, {})
       }
       this.$set(form.nonTimepoint[parent], key, val)
-    },
-
-    // customItem 读取/写入（存于 nonTimepoint 下）
-    getCustomVal: function (patientId, key, field, fallback) {
-      var form = this.patientForms[patientId]
-      if (!form) return fallback != null ? fallback : ''
-      var obj = form.nonTimepoint[key]
-      if (obj == null) return fallback != null ? fallback : ''
-      var val = obj[field]
-      return val != null ? val : (fallback != null ? fallback : '')
-    },
-    setCustomValue: function (patientId, key, val) {
-      var form = this.patientForms[patientId]
-      if (!form) return
-      if (!form.nonTimepoint[key]) {
-        this.$set(form.nonTimepoint, key, {})
-      }
-      this.$set(form.nonTimepoint[key], 'value', val)
     },
 
     handleDataChange: function () {

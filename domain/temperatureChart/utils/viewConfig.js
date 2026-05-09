@@ -1,4 +1,4 @@
-import { bodyTemperature, TOP_KEYS, HEAD_HEIGHT, LINE_HEIGHT} from "../const/index"
+import { bodyTemperature, TOP_KEYS, BOTTOM_KEYS, HEAD_HEIGHT, LINE_HEIGHT} from "../const/index"
 
 
 export default class viewConfig {
@@ -17,7 +17,6 @@ export default class viewConfig {
   } = {}) {
     // 基础配置赋值
     this.width = width
-    this.height = height
     this.stroke = stroke
     this.strokeWidth = strokeWidth
     this.strokeLinecap = strokeLinecap
@@ -30,20 +29,24 @@ export default class viewConfig {
     // 计算属性赋值
     this.contentWidth = width - marginLeft - marginRight
     this.step = this.contentWidth / 8
-    this.bottomPos = height - HEAD_HEIGHT - marginTop - (marginBottom - 30) // 底部坐标，30是因为默认的30，忘记计算了，后续的按照30的偏移量计算
-    this.tableHeight = height - marginBottom - HEAD_HEIGHT
-    const { micoStep, verticalHeight } = this.utilsGetMicoPos(
-      this.step,
-      this.bottomPos
-    )
+
+    // 先计算不受 height 影响的布局量
+    const { micoStep, verticalHeight } = this.utilsGetMicoPos(this.step, 0)
     this.micoStep = micoStep
     this.verticalHeight = verticalHeight
-    this.X_OFFSET = micoStep / 2 // 为了让图标在小格子居中展示，需要进行一个偏移
-    this.xRange = [this.step, width - marginLeft - marginRight] // [60, 860]
+    this.X_OFFSET = micoStep / 2
+    this.xRange = [this.step, width - marginLeft - marginRight]
     this.topPos = marginTop + HEAD_HEIGHT
-    this.topKeysPos = LINE_HEIGHT * (TOP_KEYS.length + 1) // 1 是时间那一行
+    this.topKeysPos = LINE_HEIGHT * (TOP_KEYS.length + 1)
     this.bottomKeysPosStart = this.topKeysPos + verticalHeight
     this.yRange = [this.bottomKeysPosStart, this.topKeysPos]
+
+    // 动态计算 height：确保 tableHeight 覆盖所有底部数据行
+    const bottomEnd = this.bottomKeysPosStart + (BOTTOM_KEYS.length + 5) * LINE_HEIGHT
+    this.height = Math.max(height, bottomEnd + marginBottom + HEAD_HEIGHT)
+
+    this.bottomPos = this.height - HEAD_HEIGHT - marginTop - (marginBottom - 30)
+    this.tableHeight = this.height - marginBottom - HEAD_HEIGHT
   }
 
   // 获取折线区域的高度

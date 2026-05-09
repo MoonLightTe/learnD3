@@ -93,8 +93,8 @@ export function renderToForm(renderData, date) {
       case '004': np.urinationCount = { value: item.typeValue }; break
       case '010': np.allergyDrug = { value: item.typeValue }; break
       case '030': np.height = { value: item.typeValue }; break
-      case '020': np.painScore = { value: item.typeValue }; break
-      case '021': np.fallRisk = { value: item.typeValue }; break
+      case '020': np.custom_1 = parseCustomItem(item); break
+      case '021': np.custom_2 = parseCustomItem(item); break
     }
   })
 
@@ -221,10 +221,10 @@ export function formToRender(formData, patientInfo, weekDates, existingRenderDat
         item.typeValue = np.height && np.height.value ? String(np.height.value) : null
         break
       case '020':
-        item.typeValue = np.painScore && np.painScore.value ? String(np.painScore.value) : null
+        item.typeValue = np.custom_1 ? assembleCustomItem(np.custom_1) : null
         break
       case '021':
-        item.typeValue = np.fallRisk && np.fallRisk.value ? String(np.fallRisk.value) : null
+        item.typeValue = np.custom_2 ? assembleCustomItem(np.custom_2) : null
         break
     }
   })
@@ -270,41 +270,43 @@ function assembleBloodPressure(bp) {
 
 // --- 尿量 ---
 function parseUrineVolume(typeValue) {
-  if (!typeValue) return { value: '', mark: '' }
+  if (!typeValue) return { value: '', selectValue: '' }
   var str = String(typeValue)
-  if (str === '※') return { value: '', mark: '※' }
+  if (str === '※') return { value: '', selectValue: '※' }
   if (str.indexOf('/') > -1) {
     var parts = str.split('/')
-    return { value: parts[0] || '', mark: parts[1] || '' }
+    return { value: parts[0] || '', selectValue: parts[1] || '' }
   }
-  return { value: str, mark: '' }
+  return { value: str, selectValue: '' }
 }
 
 function assembleUrineVolume(data) {
   if (!data) return null
-  if (data.mark === '※') return '※'
-  if (data.value && data.mark) return data.value + '/' + data.mark
+  var sv = data.selectValue || data.mark || ''
+  if (sv === '※') return '※'
+  if (data.value && sv) return data.value + '/' + sv
   if (data.value) return String(data.value)
-  if (data.mark) return data.mark
+  if (sv) return sv
   return null
 }
 
 // --- 体重 ---
 function parseWeight(typeValue) {
-  if (!typeValue) return { value: '', assistMethod: '无' }
+  if (!typeValue) return { value: '', selectValue: '无' }
   var str = String(typeValue)
-  if (str === '卧床') return { value: '', assistMethod: '卧床' }
+  if (str === '卧床') return { value: '', selectValue: '卧床' }
   if (str.indexOf('/') > -1) {
     var parts = str.split('/')
-    return { value: parts[0] || '', assistMethod: parts[1] || '无' }
+    return { value: parts[0] || '', selectValue: parts[1] || '无' }
   }
-  return { value: str, assistMethod: '无' }
+  return { value: str, selectValue: '无' }
 }
 
 function assembleWeight(data) {
   if (!data) return null
-  if (data.assistMethod === '卧床') return '卧床'
-  if (data.value && data.assistMethod && data.assistMethod !== '无') return data.value + '/' + data.assistMethod
+  var sv = data.selectValue || data.assistMethod || '无'
+  if (sv === '卧床') return '卧床'
+  if (data.value && sv && sv !== '无') return data.value + '/' + sv
   if (data.value) return String(data.value)
   return null
 }
@@ -329,20 +331,31 @@ function assembleFluidIntake(data) {
 
 // --- 皮试 ---
 function parseSkinTest(typeValue) {
-  if (!typeValue) return { drugName: '', result: '' }
+  if (!typeValue) return { value: '', selectValue: '' }
   var str = String(typeValue)
   if (str.indexOf('/') > -1) {
     var parts = str.split('/')
-    return { drugName: parts[0] || '', result: parts[1] || '' }
+    return { value: parts[0] || '', selectValue: parts[1] || '' }
   }
-  return { drugName: str, result: '' }
+  return { value: str, selectValue: '' }
 }
 
 function assembleSkinTest(data) {
   if (!data) return null
-  if (data.drugName && data.result) return data.drugName + '/' + data.result
-  if (data.drugName) return data.drugName
+  var v = data.value || data.drugName || ''
+  var sv = data.selectValue || data.result || ''
+  if (v && sv) return v + '/' + sv
+  if (v) return v
   return null
+}
+
+// --- 自定义项（名称可编辑） ---
+function parseCustomItem(item) {
+  return { label: '', value: item.typeValue || '' }
+}
+function assembleCustomItem(data) {
+  if (!data) return null
+  return data.value || null
 }
 
 /**

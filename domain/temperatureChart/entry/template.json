@@ -19,36 +19,44 @@
   "nonTimepoint": [
     { "key": "bloodPressure", "label": "血压", "typeCode": "008", "unit": "mmHg", "component": "BloodPressureRow" },
     { "key": "stool", "label": "大便", "typeCode": "005", "unit": "次", "component": "StoolInlineRow" },
-    { "key": "urineVolume", "label": "尿量", "typeCode": "011", "unit": "ml", "component": "UrineCell" },
+    {
+      "key": "urineVolume", "label": "尿量", "typeCode": "011", "unit": "ml",
+      "component": "InputWithSelect",
+      "inputPlaceholder": "尿量", "selectPlaceholder": "标记",
+      "selectOptions": ["无", "C", "C+", "※"],
+      "disableInputOn": "※"
+    },
     { "key": "fluidIntake", "label": "体液入量", "typeCode": "006", "unit": "ml", "component": "FluidInput" },
     { "key": "otherOutput", "label": "其他排出量", "typeCode": "007", "unit": "ml", "component": "SimpleInput" },
     { "key": "height", "label": "身高", "typeCode": "030", "unit": "cm", "component": "SimpleInput" },
-    { "key": "weight", "label": "体重", "typeCode": "009", "unit": "kg", "component": "WeightCell", "alertRange": [1, 300] },
-    { "key": "skinTest", "label": "皮试", "typeCode": "016", "component": "SkinTestCell" },
+    {
+      "key": "weight", "label": "体重", "typeCode": "009", "unit": "kg",
+      "component": "InputWithSelect",
+      "alertRange": [1, 300],
+      "inputPlaceholder": "体重", "selectPlaceholder": "辅助方式",
+      "selectOptions": ["无", "平车", "轮椅", "卧床"],
+      "disableInputOn": "卧床"
+    },
+    {
+      "key": "skinTest", "label": "皮试", "typeCode": "016",
+      "component": "InputWithSelect",
+      "inputPlaceholder": "药物名称", "selectPlaceholder": "结果",
+      "selectOptions": ["阴性", "阳性", "弱阳性"]
+    },
     { "key": "urinationCount", "label": "小便", "typeCode": "004", "unit": "次", "component": "SimpleInput" },
     { "key": "allergyDrug", "label": "过敏药", "typeCode": "010", "component": "SimpleInput" }
   ],
 
   "customItems": [
     {
-      "key": "painScore",
-      "label": "疼痛评分",
-      "typeCode": "020",
-      "unit": "分",
-      "component": "ScoreInput",
-      "inputType": "number",
-      "options": [],
-      "alertRange": [0, 10]
+      "key": "custom_1", "label": "自定义名称1", "typeCode": "020",
+      "component": "CustomItem", "inputType": "text", "unit": "", "options": [],
+      "alertRange": null
     },
     {
-      "key": "fallRisk",
-      "label": "跌倒风险",
-      "typeCode": "021",
-      "unit": "",
-      "component": "CustomInput",
-      "inputType": "select",
-      "options": ["无", "低危", "中危", "高危"],
-      "alertRange": null
+      "key": "custom_2", "label": "自定义名称2", "typeCode": "021",
+      "component": "CustomItem", "inputType": "select", "unit": "",
+      "options": ["无", "低", "中", "高"], "alertRange": null
     }
   ],
 
@@ -62,8 +70,8 @@
     { "name": "体重(kg)", "typeCode": "009" },
     { "name": "其他排出量(ml)", "typeCode": "007" },
     { "name": "过敏药", "typeCode": "010" },
-    { "name": "疼痛评分(分)", "typeCode": "020" },
-    { "name": "跌倒风险", "typeCode": "021" }
+    { "name": "自定义名称1", "typeCode": "020", "customLabel": true },
+    { "name": "自定义名称2", "typeCode": "021", "customLabel": true }
   ],
 
   "events": [
