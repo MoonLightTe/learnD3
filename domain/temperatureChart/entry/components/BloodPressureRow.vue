@@ -1,16 +1,18 @@
 <template>
   <div class="bp-row">
-    <span class="bp-label">上午</span>
-    <div class="bp-group" :class="{ 'bp-error': amError }">
-      <el-input :value="amSystolic" size="mini" placeholder="收缩压" style="width:70px" @input="handleAmSystolic" />
-      <span>/</span>
-      <el-input :value="amDiastolic" size="mini" placeholder="舒张压" style="width:70px" @input="handleAmDiastolic" />
+    <div class="bp-pair" :class="{ 'bp-error': amError }">
+      <span class="bp-label">上午</span>
+      <input class="bp-input" :value="amSystolic" placeholder="收缩压" @input="handleAmSystolic" />
+      <span class="bp-slash">/</span>
+      <input class="bp-input" :value="amDiastolic" placeholder="舒张压" @input="handleAmDiastolic" />
+      <span class="bp-unit">mmHg</span>
     </div>
-    <span class="bp-label">下午</span>
-    <div class="bp-group" :class="{ 'bp-error': pmError }">
-      <el-input :value="pmSystolic" size="mini" placeholder="收缩压" style="width:70px" @input="handlePmSystolic" />
-      <span>/</span>
-      <el-input :value="pmDiastolic" size="mini" placeholder="舒张压" style="width:70px" @input="handlePmDiastolic" />
+    <div class="bp-pair" :class="{ 'bp-error': pmError }">
+      <span class="bp-label">下午</span>
+      <input class="bp-input" :value="pmSystolic" placeholder="收缩压" @input="handlePmSystolic" />
+      <span class="bp-slash">/</span>
+      <input class="bp-input" :value="pmDiastolic" placeholder="舒张压" @input="handlePmDiastolic" />
+      <span class="bp-unit">mmHg</span>
     </div>
     <div v-if="amError || pmError" class="bp-alert">{{ amError || pmError }}</div>
   </div>
@@ -60,10 +62,10 @@ export default {
       if (!isNaN(s) && !isNaN(d) && s <= d) return '收缩压应大于舒张压'
       return ''
     },
-    handleAmSystolic: function (val) { this.amSystolic = val; this.emitChange() },
-    handleAmDiastolic: function (val) { this.amDiastolic = val; this.emitChange() },
-    handlePmSystolic: function (val) { this.pmSystolic = val; this.emitChange() },
-    handlePmDiastolic: function (val) { this.pmDiastolic = val; this.emitChange() },
+    handleAmSystolic: function (e) { this.amSystolic = e.target.value; this.emitChange() },
+    handleAmDiastolic: function (e) { this.amDiastolic = e.target.value; this.emitChange() },
+    handlePmSystolic: function (e) { this.pmSystolic = e.target.value; this.emitChange() },
+    handlePmDiastolic: function (e) { this.pmDiastolic = e.target.value; this.emitChange() },
     emitChange: function () {
       this.$emit('input', {
         am: { systolic: this.amSystolic, diastolic: this.amDiastolic },
@@ -79,23 +81,51 @@ export default {
 .bp-row {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
   flex-wrap: wrap;
 }
-.bp-label {
-  margin: 0 4px;
-  color: #909399;
-  font-size: 12px;
-}
-.bp-group {
+.bp-pair {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  &.bp-error {
-    /deep/ .el-input__inner {
-      border-color: #f56c6c;
-    }
+  gap: 3px;
+  background: #f5f7fa;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 6px;
+  transition: background 0.15s, border-color 0.15s;
+  &:focus-within {
+    background: #fff;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
   }
+  &.bp-error {
+    border-color: #f56c6c;
+    background: #fef2f2;
+  }
+}
+.bp-label {
+  font-size: 11px;
+  color: #999;
+  flex-shrink: 0;
+}
+.bp-input {
+  width: 46px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 13px;
+  outline: none;
+  padding: 3px 2px;
+  &::placeholder { color: #ccc; font-size: 11px; }
+}
+.bp-slash {
+  color: #999;
+  font-size: 13px;
+}
+.bp-unit {
+  font-size: 10px;
+  color: #999;
+  flex-shrink: 0;
 }
 .bp-alert {
   width: 100%;

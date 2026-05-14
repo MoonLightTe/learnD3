@@ -9,6 +9,7 @@
     <!-- ===== 单患者录入 ===== -->
     <template v-if="pageMode === 'single'">
     <div class="single-entry-layout">
+      
       <div class="entry-col">
         <!-- 子 Tab -->
         <div class="entry-tabs">
@@ -24,10 +25,25 @@
           >记录事件</div>
         </div>
 
+        <!-- 患者信息栏 -->
+        <div class="patient-info-bar">
+          <span class="name">{{ patientInfo.name }}</span>
+          <span class="sep">|</span>
+          <span>{{ patientInfo.officeName }}</span>
+          <span class="sep">|</span>
+          <span>床号 {{ patientInfo.cwh }}</span>
+          <span class="sep">|</span>
+          <span>住院号 {{ patientInfo.hospCode }}</span>
+          <span class="sep">|</span>
+          <span>入院 {{ patientInfo.hospDate }} 第{{ patientInfo.hospDays }}天</span>
+          <span class="sep">|</span>
+          <span class="diag">诊断: {{ patientInfo.inDiagName }}</span>
+        </div>
+
         <!-- 工具栏 -->
         <div class="entry-toolbar">
           <div class="date-nav">
-            <span class="date-arrow" :class="{ disabled: !canPrevDay }" @click="prevDay">◀</span>
+            <el-button size="mini" icon="el-icon-arrow-left" :disabled="!canPrevDay" @click="prevDay" circle></el-button>
             <el-date-picker
               v-model="currentDate"
               type="date"
@@ -38,28 +54,15 @@
               @change="handleDateChange"
               style="width: 130px"
             />
-            <span class="date-arrow" :class="{ disabled: !canNextDay }" @click="nextDay">▶</span>
+            <el-button size="mini" icon="el-icon-arrow-right" :disabled="!canNextDay" @click="nextDay" circle></el-button>
             <span class="week-label">{{ weekLabel }}</span>
-          </div>
-          <div class="patient-info-bar">
-            <span class="name">{{ patientInfo.name }}</span>
-            <span class="sep">|</span>
-            <span>{{ patientInfo.officeName }}</span>
-            <span class="sep">|</span>
-            <span>床号 {{ patientInfo.cwh }}</span>
-            <span class="sep">|</span>
-            <span>住院号 {{ patientInfo.hospCode }}</span>
-            <span class="sep">|</span>
-            <span>入院 {{ patientInfo.hospDate }} 第{{ patientInfo.hospDays }}天</span>
-            <span class="sep">|</span>
-            <span class="diag">诊断: {{ patientInfo.inDiagName }}</span>
           </div>
           <div class="toolbar-actions">
             <el-button size="small" @click="showSyncDialog = true">同步数据</el-button>
             <el-button size="small" @click="handlePrint">打印</el-button>
             <el-button size="small" type="danger" plain @click="handleClearAll">清空</el-button>
             <el-button size="small" :disabled="!hasUnsaved" @click="handleCancel">取消</el-button>
-            <el-button size="small" type="primary" :loading="saving" @click="handleSave">保存</el-button>
+            <el-button size="small" type="primary" :loading="saving" @click="handleSave">保存 (Ctrl+S)</el-button>
           </div>
         </div>
 
@@ -236,6 +239,7 @@ export default {
       templateConfig: TEMPLATE_CONFIG,
       renderData: null,
       allWeeks: {},
+      customNames: {},
       formData: {
         date: '',
         timepoints: {},
@@ -290,6 +294,10 @@ export default {
     if (saved && saved.weeks) {
       this.allWeeks = saved.weeks
     }
+    if (saved && saved.customNames) {
+      this.customNames = saved.customNames
+      this.applyCustomNames()
+    }
 
     // 计算当前周
     var today = dayjs().format('YYYY-MM-DD')
@@ -299,6 +307,17 @@ export default {
   mounted: function () {
     this.loadCurrentWeek()
     this.$nextTick(function () { this.renderChart() }.bind(this))
+    var self = this
+    this._ctrlSHandler = function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        self.handleSave()
+      }
+    }
+    document.addEventListener('keydown', this._ctrlSHandler)
+  },
+  beforeDestroy: function () {
+    if (this._ctrlSHandler) document.removeEventListener('keydown', this._ctrlSHandler)
   },
   watch: {
     pageMode: function (mode) {
@@ -329,7 +348,54 @@ export default {
           types: empty.types
         }
       }
+      this.applyCustomNames()
       this.loadFormData(this.currentDate)
+    },
+
+    // 将全局 customNames 应用到 templateConfig + renderData.types
+    applyCustomNames: function () {
+      var items = this.templateConfig.customItems || []
+      var bottomKeys = this.templateConfig.bottomKeys || []
+      // 构建 typeCode → customName 映射，避免嵌套循环
+      var tcMap = {}
+      for (var i = 0; i < items.length; i++) {
+        var key = items[i].key
+        if (!key || !this.customNames[key]) continue
+        items[i].label = this.customNames[key]
+        tcMap[items[i].typeCode] = this.customNames[key]
+        for (var k = 0; k < bottomKeys.length; k++) {
+          if (bottomKeys[k].typeCode === items[i].typeCode) {
+            bottomKeys[k].name = this.customNames[key]
+            break
+          }
+        }
+      }
+      if (this.renderData && this.renderData.types) {
+        var types = this.renderData.types
+        for (var t = 0; t < types.length; t++) {
+          var name = tcMap[types[t].typeCode]
+          if (name) types[t].customName = name
+        }
+      }
+    },
+
+    // 将 customNames 写入给定 types 数组（不修改原数组，返回深拷贝）
+    applyCustomNamesToTypes: function (types) {
+      var hasCustom = Object.keys(this.customNames).length > 0
+      if (!hasCustom) return types
+      var items = this.templateConfig.customItems || []
+      var tcMap = {}
+      for (var i = 0; i < items.length; i++) {
+        if (this.customNames[items[i].key]) {
+          tcMap[items[i].typeCode] = this.customNames[items[i].key]
+        }
+      }
+      var cloned = JSON.parse(JSON.stringify(types))
+      for (var t = 0; t < cloned.length; t++) {
+        var name = tcMap[cloned[t].typeCode]
+        if (name) cloned[t].customName = name
+      }
+      return cloned
     },
 
     // 保存当前周到 allWeeks
@@ -362,8 +428,29 @@ export default {
       var el = document.getElementById('chartWrapper')
       if (el) el.innerHTML = ''
       if (this.renderData) {
+        this.renderData.surgeryDates = this.collectAllSurgeryDates()
         init(this.renderData, 'chartWrapper')
       }
+    },
+
+    collectAllSurgeryDates: function () {
+      var dates = []
+      var self = this
+      Object.keys(this.allWeeks).forEach(function (weekStart) {
+        var weekData = self.allWeeks[weekStart]
+        if (!weekData || !weekData.rows) return
+        weekData.rows.forEach(function (row) {
+          if (!row.rowBOS) return
+          var hasSurgery = false
+          var rowDate = null
+          row.rowBOS.forEach(function (item) {
+            if (item.typeCode === '012' && item.typeValue === '手术') hasSurgery = true
+            if (!rowDate && item.date) rowDate = item.date.split(' ')[0]
+          })
+          if (hasSurgery && rowDate && dates.indexOf(rowDate) === -1) dates.push(rowDate)
+        })
+      })
+      return dates
     },
 
     // 表单数据变更 → 实时预览（防抖）
@@ -438,7 +525,7 @@ export default {
       var self = this
       setTimeout(function () {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ weeks: self.allWeeks }))
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ weeks: self.allWeeks, customNames: self.customNames }))
         } catch (e) { /* ignore */ }
         self.hasUnsaved = false
         self.saving = false
@@ -457,6 +544,7 @@ export default {
       }).then(function () {
         localStorage.removeItem(STORAGE_KEY)
         self.allWeeks = {}
+        self.customNames = {}
         self.currentWeekStart = getWeekStart(dayjs().format('YYYY-MM-DD'))
         self.currentDate = self.currentWeekStart
         self.loadCurrentWeek()
@@ -464,7 +552,7 @@ export default {
         self.hasUnsaved = false
         self.lastSaveTime = ''
         self.$message.success('已清空所有数据')
-      })
+      }).catch(function () {})
     },
 
     handleCancel: function () {
@@ -477,7 +565,7 @@ export default {
       }).then(function () {
         self.loadFormData(self.currentDate)
         self.renderChart()
-      })
+      }).catch(function () {})
     },
 
     // 多页打印：每页一周（按入院周分组）
@@ -504,19 +592,6 @@ export default {
         var page = document.createElement('div')
         page.className = 'print-page'
 
-        var header = document.createElement('div')
-        header.className = 'print-header'
-        header.innerHTML =
-          '<div style="text-align:center;font-size:18px;font-weight:bold;letter-spacing:4px">' + (patientInfo.title || '') + '</div>' +
-          '<div style="text-align:center;font-size:16px;font-weight:bold;margin:4px 0">体温单</div>' +
-          '<div style="display:flex;justify-content:space-between;font-size:11px;color:#333">' +
-            '<span>姓名: ' + (patientInfo.name || '') + '</span>' +
-            '<span>科别: ' + (patientInfo.officeName || '') + '</span>' +
-            '<span>床号: ' + (patientInfo.cwh || '') + '</span>' +
-            '<span>住院号: ' + (patientInfo.hospCode || '') + '</span>' +
-          '</div>'
-        page.appendChild(header)
-
         var chartDiv = document.createElement('div')
         chartDiv.className = 'print-chart'
         page.appendChild(chartDiv)
@@ -525,7 +600,7 @@ export default {
         var weekRenderData = {
           grParamBOS: [Object.assign({}, patientInfo, { beginDate: weekStart })],
           rows: weekData.rows,
-          types: weekData.types
+          types: this.applyCustomNamesToTypes(weekData.types)
         }
         init(weekRenderData, null, chartDiv)
       }.bind(this))
@@ -544,44 +619,10 @@ export default {
     handleCustomLabelChange: function (payload) {
       var key = payload.key
       var label = payload.label
-      // 更新 templateConfig.customItems
-      var items = this.templateConfig.customItems || []
-      for (var i = 0; i < items.length; i++) {
-        if (items[i].key === key) {
-          items[i].label = label
-          break
-        }
-      }
-      // 更新 templateConfig.bottomKeys 对应项的 name
-      var bottomKeys = this.templateConfig.bottomKeys || []
-      for (var j = 0; j < bottomKeys.length; j++) {
-        if (bottomKeys[j].typeCode === key || bottomKeys[j].customLabel) {
-          // 按 typeCode 匹配
-          var customItems = this.templateConfig.customItems || []
-          for (var ci = 0; ci < customItems.length; ci++) {
-            if (customItems[ci].key === key && bottomKeys[j].typeCode === customItems[ci].typeCode) {
-              bottomKeys[j].name = label
-              break
-            }
-          }
-        }
-      }
-      // 同步更新 TEMPLATE_CONFIG（被 const/index.js 的 BOTTOM_KEYS 引用的源对象）
-      TEMPLATE_CONFIG.customItems = items
-      TEMPLATE_CONFIG.bottomKeys = bottomKeys
-      // 更新 renderData types 中所有该 key 的 customName
-      if (this.renderData && this.renderData.types) {
-        var typeCode = null
-        for (var ti = 0; ti < items.length; ti++) {
-          if (items[ti].key === key) { typeCode = items[ti].typeCode; break }
-        }
-        if (typeCode) {
-          this.renderData.types.forEach(function (t) {
-            if (t.typeCode === typeCode) t.customName = label
-          })
-        }
-      }
-      // 触发重新渲染
+      // 存入全局 customNames
+      this.$set(this.customNames, key, label)
+      // 复用 applyCustomNames 统一刷新 templateConfig + renderData.types
+      this.applyCustomNames()
       this.schedulePreview()
     },
 
@@ -688,14 +729,13 @@ export default {
 .entry-tab {
   padding: 12px 20px;
   cursor: pointer;
-  color: #666;
-  border-bottom: 2px solid transparent;
-  font-weight: 500;
+  color: #888;
+  font-weight: 400;
   user-select: none;
   &:hover { color: #333; }
   &.active {
-    color: #1a73e8;
-    border-bottom-color: #1a73e8;
+    color: #333;
+    font-weight: 600;
   }
 }
 
@@ -711,22 +751,7 @@ export default {
 .date-nav {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.date-arrow {
-  cursor: pointer;
-  color: #1a73e8;
-  font-size: 16px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  user-select: none;
-  &:hover { background: #e8f0fe; }
-  &.disabled {
-    color: #ccc;
-    cursor: not-allowed;
-    &:hover { background: transparent; }
-  }
+  gap: 4px;
 }
 
 .week-label {
@@ -744,10 +769,12 @@ export default {
   align-items: center;
   font-size: 12px;
   color: #666;
-  flex: 1;
+  padding: 8px 16px;
+  background: #fafafa;
+  border-bottom: 1px solid #eee;
   .name { font-weight: 600; font-size: 14px; color: #333; }
   .sep { color: #ddd; }
-  .diag { color: #f57c00; font-weight: 500; }
+  .diag { color: #555; font-weight: 500; }
 }
 
 .toolbar-actions {
@@ -781,7 +808,8 @@ export default {
 
 /* 右侧预览区 */
 .preview-col {
-  width: 860px;
+  flex: 0 0 55%;
+  min-width: 600px;
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -824,14 +852,10 @@ export default {
   .print-page {
     page-break-after: always;
     width: 100%;
-    padding: 10mm;
     box-sizing: border-box;
   }
   .print-page:last-child {
     page-break-after: auto;
-  }
-  .print-header {
-    margin-bottom: 8px;
   }
   .print-chart {
     width: 100%;

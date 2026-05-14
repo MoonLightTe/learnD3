@@ -29,6 +29,9 @@
           style="width:160px"
         />
       </el-form-item>
+      <el-form-item v-if="form.type === '转科'" label="目标科室" required>
+        <el-input v-model="form.targetDept" placeholder="请输入目标科室" style="width:240px" />
+      </el-form-item>
     </el-form>
     <span slot="footer">
       <el-button size="small" @click="handleClose">取消</el-button>
@@ -39,6 +42,7 @@
 
 <script>
 import { EVENT_TYPES } from '../constants.js'
+import TEMPLATE_CONFIG from '../template.json'
 import dayjs from 'dayjs'
 
 export default {
@@ -51,7 +55,7 @@ export default {
   data: function () {
     return {
       eventTypes: EVENT_TYPES,
-      form: { type: '', content: '', eventTime: '', recordTime: '' }
+      form: { type: '', content: '', eventTime: '', recordTime: '', targetDept: '' }
     }
   },
   computed: {
@@ -67,14 +71,16 @@ export default {
             type: this.editData.type || '',
             content: this.editData.content || '',
             eventTime: this.editData.eventTime || '',
-            recordTime: this.editData.recordTime || ''
+            recordTime: this.editData.recordTime || '',
+            targetDept: this.editData.targetDept || ''
           }
         } else {
           this.form = {
             type: '',
             content: '',
             eventTime: this.timepoints.length > 0 ? this.timepoints[0] : '',
-            recordTime: dayjs().format('HH:mm')
+            recordTime: dayjs().format('HH:mm'),
+            targetDept: ''
           }
         }
       }
@@ -83,7 +89,10 @@ export default {
   methods: {
     handleConfirm: function () {
       if (!this.form.type) return this.$message.warning('请选择事件类型')
-      if (!this.form.eventTime) return this.$message.warning('请选择事件时间')
+      var self = this
+      var eventConfig = (TEMPLATE_CONFIG.events || []).find(function (e) { return e.type === self.form.type })
+      if (eventConfig && eventConfig.needTime !== false && !this.form.eventTime) return this.$message.warning('请选择事件时间')
+      if (this.form.type === '转科' && !this.form.targetDept) return this.$message.warning('请填写目标科室')
       this.$emit('confirm', Object.assign({}, this.form))
       this.$emit('update:visible', false)
     },
@@ -93,3 +102,24 @@ export default {
   }
 }
 </script>
+
+<style lang="less" scoped>
+/deep/ .el-dialog__header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+/deep/ .el-dialog__body {
+  padding: 20px;
+}
+/deep/ .el-form-item {
+  margin-bottom: 16px;
+}
+/deep/ .el-form-item__label {
+  font-size: 13px;
+  color: #555;
+}
+/deep/ .el-dialog__footer {
+  padding: 12px 20px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+</style>

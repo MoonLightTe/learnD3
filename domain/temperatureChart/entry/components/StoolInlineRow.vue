@@ -96,7 +96,8 @@ export default {
   },
   data: function () {
     return {
-      form: { selfCount: 0, enemaCount: 0, enemaStoolCount: 0, specialStatus: '' }
+      form: { selfCount: 0, enemaCount: 0, enemaStoolCount: 0, specialStatus: '' },
+      selfEmitting: false
     }
   },
   computed: {
@@ -113,6 +114,10 @@ export default {
     rawValue: {
       immediate: true,
       handler: function (val) {
+        if (this.selfEmitting) {
+          this.selfEmitting = false
+          return
+        }
         this.form = parseStoolValue(val)
       }
     }
@@ -130,6 +135,7 @@ export default {
       this.emitChange()
     },
     emitChange: function () {
+      this.selfEmitting = true
       var val = assembleStoolValue(this.form)
       this.$set(this.formData.nonTimepoint, this.rowConfig.key, { rawValue: val })
       this.$emit('change')
@@ -161,15 +167,17 @@ export default {
   width: 36px;
   padding: 3px 4px;
   border: 1px solid transparent;
-  border-radius: 3px;
+  border-radius: 4px;
   text-align: center;
   font-size: 12px;
-  background: transparent;
+  background: #f5f7fa;
   outline: none;
+  transition: background 0.15s, border-color 0.15s;
 }
 .stool-input:focus {
   background: #fff;
   border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
 }
 .stool-input.disabled {
   opacity: 0.4;
@@ -183,15 +191,17 @@ export default {
   width: 72px;
   padding: 3px 4px;
   border: 1px solid transparent;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 11px;
-  background: transparent;
+  background: #f5f7fa;
   outline: none;
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
 }
 .stool-select:focus {
   background: #fff;
   border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
 }
 .stool-preview {
   font-size: 13px;

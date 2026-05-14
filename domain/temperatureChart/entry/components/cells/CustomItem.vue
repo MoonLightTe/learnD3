@@ -9,11 +9,11 @@
     <input
       v-if="inputType !== 'select'"
       class="custom-value"
+      :class="{ 'out-of-range': isOutOfRange }"
       :value="itemValue"
       :placeholder="valuePlaceholder"
-      :class="{ 'out-of-range': isOutOfRange }"
-      :style="isOutOfRange ? { color: '#d32f2f' } : {}"
       @input="handleValueChange"
+      @keydown.enter="handleEnter"
     />
     <el-select
       v-else
@@ -78,12 +78,21 @@ export default {
       var raw = val && val.target ? val.target.value : val
       this.$set(this.ensureNp(), 'value', raw)
       this.$emit('change')
+    },
+    handleEnter: function () {
+      var table = this.$el && this.$el.closest('table')
+      if (!table) return
+      var inputs = Array.from(table.querySelectorAll('input:not([disabled])'))
+      var idx = inputs.indexOf(document.activeElement)
+      if (idx >= 0 && idx < inputs.length - 1) {
+        inputs[idx + 1].focus()
+      }
     }
   }
 }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .custom-item {
   display: flex;
   align-items: center;
@@ -93,35 +102,41 @@ export default {
   width: 80px;
   padding: 4px 6px;
   border: 1px solid #d9d9d9;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 12px;
   color: #333;
   background: #fafafa;
   outline: none;
+  transition: background 0.15s, border-color 0.15s;
 }
 .custom-label:focus {
   border-color: #1a73e8;
   background: #fff;
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
 }
 .custom-value {
   padding: 4px 6px;
   border: 1px solid transparent;
   text-align: center;
   font-size: 13px;
-  border-radius: 3px;
-  background: transparent;
+  border-radius: 4px;
+  background: #f5f7fa;
   outline: none;
   width: 100px;
+  transition: background 0.15s, border-color 0.15s;
 }
 .custom-value:focus {
   background: #fff;
   border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
 }
 .custom-value::placeholder {
-  color: #ddd;
+  color: #bbb;
+  font-size: 12px;
 }
 .custom-value.out-of-range {
   color: #d32f2f;
+  background: #fef2f2;
 }
 .custom-unit {
   font-size: 11px;
@@ -132,8 +147,11 @@ export default {
   /deep/ .el-input__inner {
     padding: 0 20px 0 6px;
     font-size: 11px;
-    height: 26px;
-    line-height: 26px;
+    height: 28px;
+    line-height: 28px;
+    background: #f5f7fa;
+    border: 1px solid transparent;
+    border-radius: 4px;
   }
 }
 </style>

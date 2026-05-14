@@ -99,7 +99,7 @@ export default {
         type: 'warning'
       }).then(function () {
         this.$emit('clear-column', tp)
-      }.bind(this))
+      }.bind(this)).catch(function () {})
     }
   }
 }
@@ -107,7 +107,7 @@ export default {
 
 <style lang="less" scoped>
 .data-grid {
-  overflow-x: auto;
+  overflow: visible;
 }
 
 table {

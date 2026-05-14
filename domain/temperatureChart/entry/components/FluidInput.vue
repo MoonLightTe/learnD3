@@ -1,11 +1,23 @@
 <template>
   <div class="fluid-input">
-    <el-input :value="value" size="mini" placeholder="数值" style="width:160px" @input="handleValueInput">
-      <template slot="append">ml</template>
-    </el-input>
-    <el-input :value="hours" size="mini" placeholder="小时" style="width:140px" @input="handleHoursInput">
-      <template slot="append">h</template>
-    </el-input>
+    <div class="fluid-field">
+      <input
+        class="fluid-val"
+        :value="value"
+        placeholder="数值"
+        @input="handleValueInput"
+      />
+      <span class="fluid-unit">ml</span>
+    </div>
+    <div class="fluid-field">
+      <input
+        class="fluid-val"
+        :value="hours"
+        placeholder="小时"
+        @input="handleHoursInput"
+      />
+      <span class="fluid-unit">h</span>
+    </div>
   </div>
 </template>
 
@@ -17,12 +29,12 @@ export default {
     hours: { type: [String, Number], default: '' }
   },
   methods: {
-    handleValueInput(val) {
-      this.$emit('input', val)
+    handleValueInput: function (e) {
+      this.$emit('input', e.target.value)
       this.$emit('change')
     },
-    handleHoursInput(val) {
-      this.$emit('hours-change', val)
+    handleHoursInput: function (e) {
+      this.$emit('hours-change', e.target.value)
       this.$emit('change')
     }
   }
@@ -33,6 +45,36 @@ export default {
 .fluid-input {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
+}
+.fluid-field {
+  display: inline-flex;
+  align-items: center;
+  background: #f5f7fa;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 2px 6px;
+  height: 28px;
+  transition: background 0.15s, border-color 0.15s;
+  &:focus-within {
+    background: #fff;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
+  }
+}
+.fluid-val {
+  width: 60px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  outline: none;
+  padding: 0 2px;
+  &::placeholder { color: #bbb; font-size: 12px; }
+}
+.fluid-unit {
+  font-size: 10px;
+  color: #999;
+  flex-shrink: 0;
+  margin-left: 2px;
 }
 </style>
