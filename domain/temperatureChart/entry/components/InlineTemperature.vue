@@ -12,6 +12,7 @@
         <input
           ref="valueInput"
           class="temp-value"
+          inputmode="decimal"
           :value="value"
           :placeholder="rangeHint"
           @input="handleValueInput"
@@ -117,7 +118,7 @@ export default {
       return tp && tp.temperature ? tp.temperature : {}
     },
     collectionMode: function () {
-      return this.tpData.collectionMode != null ? this.tpData.collectionMode : 2
+      return this.tpData.collectionMode != null ? this.tpData.collectionMode : this.getPrevType()
     },
     value: function () {
       return this.tpData.value || ''
@@ -184,11 +185,24 @@ export default {
     ensureTpData: function () {
       var tp = this.formData.timepoints[this.timepoint]
       if (!tp.temperature) {
-        this.$set(tp, 'temperature', { collectionMode: 2, value: '', coolingRecords: [] })
+        var prevMode = this.getPrevType()
+        this.$set(tp, 'temperature', { collectionMode: prevMode, value: '', coolingRecords: [] })
       } else if (tp.temperature.collectionMode == null) {
-        tp.temperature.collectionMode = 2
+        tp.temperature.collectionMode = this.getPrevType()
       }
       return tp.temperature
+    },
+    getPrevType: function () {
+      var tps = this.templateConfig && this.templateConfig.timepoints
+      if (!tps) return 2
+      var idx = tps.indexOf(this.timepoint)
+      for (var i = idx - 1; i >= 0; i--) {
+        var prev = this.formData.timepoints[tps[i]]
+        if (prev && prev.temperature && prev.temperature.collectionMode != null) {
+          return prev.temperature.collectionMode
+        }
+      }
+      return 2
     },
     selectType: function (val) {
       var temp = this.ensureTpData()

@@ -60,7 +60,7 @@
           <div class="toolbar-actions">
             <el-button size="small" @click="showSyncDialog = true">同步数据</el-button>
             <el-button size="small" @click="handlePrint">打印</el-button>
-            <el-button size="small" type="danger" plain @click="handleClearAll">清空</el-button>
+            <el-button size="small" type="text" class="clear-btn" @click="handleClearAll">清空</el-button>
             <el-button size="small" :disabled="!hasUnsaved" @click="handleCancel">取消</el-button>
             <el-button size="small" type="primary" :loading="saving" @click="handleSave">保存 (Ctrl+S)</el-button>
           </div>
@@ -781,6 +781,15 @@ export default {
   display: flex;
   gap: 8px;
   margin-left: auto;
+  align-items: center;
+}
+
+.clear-btn {
+  color: #bbb;
+  font-size: 13px;
+  &:hover {
+    color: #d32f2f;
+  }
 }
 
 .grid-container {

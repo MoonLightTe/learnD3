@@ -2,16 +2,16 @@
   <div class="bp-row">
     <div class="bp-pair" :class="{ 'bp-error': amError }">
       <span class="bp-label">上午</span>
-      <input class="bp-input" :value="amSystolic" placeholder="收缩压" @input="handleAmSystolic" />
+      <input class="bp-input" inputmode="numeric" :value="amSystolic" placeholder="收缩压" @input="handleAmSystolic" @keydown.enter="handleEnter" />
       <span class="bp-slash">/</span>
-      <input class="bp-input" :value="amDiastolic" placeholder="舒张压" @input="handleAmDiastolic" />
+      <input class="bp-input" inputmode="numeric" :value="amDiastolic" placeholder="舒张压" @input="handleAmDiastolic" @keydown.enter="handleEnter" />
       <span class="bp-unit">mmHg</span>
     </div>
     <div class="bp-pair" :class="{ 'bp-error': pmError }">
       <span class="bp-label">下午</span>
-      <input class="bp-input" :value="pmSystolic" placeholder="收缩压" @input="handlePmSystolic" />
+      <input class="bp-input" inputmode="numeric" :value="pmSystolic" placeholder="收缩压" @input="handlePmSystolic" @keydown.enter="handleEnter" />
       <span class="bp-slash">/</span>
-      <input class="bp-input" :value="pmDiastolic" placeholder="舒张压" @input="handlePmDiastolic" />
+      <input class="bp-input" inputmode="numeric" :value="pmDiastolic" placeholder="舒张压" @input="handlePmDiastolic" @keydown.enter="handleEnter" />
       <span class="bp-unit">mmHg</span>
     </div>
     <div v-if="amError || pmError" class="bp-alert">{{ amError || pmError }}</div>
@@ -72,6 +72,15 @@ export default {
         pm: { systolic: this.pmSystolic, diastolic: this.pmDiastolic }
       })
       this.$emit('change')
+    },
+    handleEnter: function () {
+      var table = this.$el && this.$el.closest('table')
+      if (!table) return
+      var inputs = Array.from(table.querySelectorAll('input:not([disabled])'))
+      var idx = inputs.indexOf(document.activeElement)
+      if (idx >= 0 && idx < inputs.length - 1) {
+        inputs[idx + 1].focus()
+      }
     }
   }
 }

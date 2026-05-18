@@ -538,6 +538,7 @@ function groupTemperatureData(datas) {
     rowsData,
     symbolGoUp,
     brokenLineData: [symbolGoUp],
+    surgeryDates: datas.surgeryDates || null,
   };
 }
 
@@ -563,9 +564,9 @@ function setMergeTag(ymbolTextArr = [], symbolContent = []) {
         arr.push({
           ...item,
           ...res,
-          value: item.value
-            ? (item.value ? item.value : "") + (res.value ? res.value : "")
-            : "",
+          value: item.value || "",
+          recordTime: res.value || null,
+          times: item.times,
         });
       }
     });
@@ -836,7 +837,7 @@ function drawAnus(svg, pathData, viewConfig) {
     y: getYPosition(pathData, viewConfig.bodyScale),
     r: 3,
   };
-  drawRoundIcon(iconObj);
+  drawXIcon(iconObj);
 }
 
 // 绘制肛温
@@ -1070,10 +1071,33 @@ function drawBottomLineData(svg, viewConfig) {
       .attr("class", "bottomText")
       .text(function (i) {
         if (i === 0) return displayName;
+        if (splitAmPm) {
+          var val = getTypeValue(key, viewConfig.renderData.typesData)[i - 1]?.typeValue || '';
+          var parts = String(val).split(/\s+/);
+          return parts[0] || '';
+        }
         return getTypeValue(key, viewConfig.renderData.typesData)[i - 1]?.typeValue;
       })
       .attr("x", (i) => viewConfig.step * i + textLeftMargin)
       .attr("y", viewConfig.bottomKeysPosStart + (index + 3) * LINE_HEIGHT - TEXT_MARGIN_BOTTOM);
+    // 血压行：下午值渲染在分割线右侧
+    if (splitAmPm) {
+      var yLine = viewConfig.bottomKeysPosStart + (index + 3) * LINE_HEIGHT - TEXT_MARGIN_BOTTOM;
+      var bpData = getTypeValue(key, viewConfig.renderData.typesData);
+      for (var d = 0; d < 7; d++) {
+        var val = bpData[d]?.typeValue || '';
+        var parts = String(val).split(/\s+/);
+        if (parts[1]) {
+          var pmX = viewConfig.step * (d + 1) + viewConfig.step / 2 + textLeftMargin;
+          g.append("text")
+            .attr("style", "font-size:14px")
+            .attr("class", "bottomText")
+            .text(parts[1])
+            .attr("x", pmX)
+            .attr("y", yLine);
+        }
+      }
+    }
   });
 }
 
@@ -1200,19 +1224,15 @@ function drawSpecialText(svg, textData, viewConfig, isBottom = false) {
       var chars = displayText.split("");
       return isBottom
         ? viewConfig.bottomKeysPosStart - chars.length * LINE_HEIGHT - 6
-        : viewConfig.topKeysPos - textLeftMargin;
+        : viewConfig.topKeysPos + LINE_HEIGHT;
     });
 }
 
-// 格式化事件文本："事件名丨中文时分"
+// 格式化事件文本："事件名丨中文记录时间"
 function formatEventText(d) {
   var eventType = d.value;
   if (!eventType) return "";
-  var cfg = getEventConfig(eventType);
-  // 手术/请假无时间
-  if (cfg && !cfg.needTime) return eventType;
-  // 有时间：拼接中文时分
-  var timeStr = d.times || "";
+  var timeStr = d.recordTime || "";
   var cnTime = toChineseTime(timeStr);
   return cnTime ? eventType + "丨" + cnTime : eventType;
 }

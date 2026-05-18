@@ -50,13 +50,13 @@ export function renderToForm(renderData, date) {
             break
           case '012':
             if (item.typeValue) {
-              // 读取同行的 013 作为事件标题
-              var contentItem = row.rowBOS.find(function (r) { return r.typeCode === '013' })
+              // 读取同行的 013 作为记录时间
+              var timeItem = row.rowBOS.find(function (r) { return r.typeCode === '013' })
               form.events.push({
                 type: item.typeValue,
-                content: contentItem ? contentItem.typeValue || '' : '',
+                content: '',
                 eventTime: time,
-                recordTime: '',
+                recordTime: timeItem ? timeItem.typeValue || '' : '',
                 recorder: ''
               })
             }
@@ -176,7 +176,7 @@ export function formToRender(formData, patientInfo, weekDates, existingRenderDat
         item.typeValue = evt ? evt.type : null
       }
       if (item.typeCode === '013') {
-        item.typeValue = evt && evt.content ? evt.content : null
+        item.typeValue = evt && evt.recordTime ? evt.recordTime : null
       }
     })
   })

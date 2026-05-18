@@ -7,11 +7,11 @@
   >
     <div class="cooling-section">
       <div class="cooling-header">
-        <span class="cooling-count">共 {{ records.length }} 条记录</span>
+        <span class="cooling-count">共 {{ localRecords.length }} 条记录</span>
         <el-button type="text" size="small" icon="el-icon-plus" @click="addRecord">添加</el-button>
       </div>
-      <div v-if="records.length === 0" class="cooling-empty">暂无降温记录，点击上方「添加」新增</div>
-      <div v-for="(record, index) in records" :key="index" class="cooling-row">
+      <div v-if="localRecords.length === 0" class="cooling-empty">暂无降温记录，点击上方「添加」新增</div>
+      <div v-for="(record, index) in localRecords" :key="index" class="cooling-row">
         <el-select v-model="record.coolingType" size="small" placeholder="类型" style="width:110px">
           <el-option v-for="t in coolingTypes" :key="t" :label="t" :value="t" />
         </el-select>

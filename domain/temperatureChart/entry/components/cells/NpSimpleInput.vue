@@ -2,9 +2,11 @@
   <div class="np-simple-input">
     <input
       class="np-input"
+      inputmode="numeric"
       :value="value"
       :placeholder="rowConfig.label"
       @input="onInput"
+      @keydown.enter="handleEnter"
     />
     <span v-if="rowConfig.unit" class="unit-label">{{ rowConfig.unit }}</span>
   </div>
@@ -33,6 +35,15 @@ export default {
         this.$set(this.formData.nonTimepoint[key], 'value', e.target.value)
       }
       this.$emit('change')
+    },
+    handleEnter: function () {
+      var table = this.$el && this.$el.closest('table')
+      if (!table) return
+      var inputs = Array.from(table.querySelectorAll('input:not([disabled])'))
+      var idx = inputs.indexOf(document.activeElement)
+      if (idx >= 0 && idx < inputs.length - 1) {
+        inputs[idx + 1].focus()
+      }
     }
   }
 }

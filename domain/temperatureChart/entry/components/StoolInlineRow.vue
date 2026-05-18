@@ -5,33 +5,36 @@
       <input
         class="stool-input"
         :value="form.selfCount"
-        type="number"
+        inputmode="numeric"
         min="0"
         max="99"
         placeholder="0"
         @input="onInput('selfCount', $event)"
+        @keydown.enter="handleEnter"
       />
       <label>灌肠</label>
       <input
         class="stool-input"
         :value="form.enemaCount"
-        type="number"
+        inputmode="numeric"
         min="0"
         max="99"
         placeholder="0"
         @input="onInput('enemaCount', $event)"
+        @keydown.enter="handleEnter"
       />
       <label>灌后</label>
       <input
         class="stool-input"
         :class="{ disabled: form.enemaCount === 0 }"
         :value="form.enemaStoolCount"
-        type="number"
+        inputmode="numeric"
         min="0"
         max="99"
         placeholder="0"
         :disabled="form.enemaCount === 0"
         @input="onInput('enemaStoolCount', $event)"
+        @keydown.enter="handleEnter"
       />
       <select class="stool-select" :value="form.specialStatus" @change="onSelect($event)">
         <option value="">无</option>
@@ -139,6 +142,15 @@ export default {
       var val = assembleStoolValue(this.form)
       this.$set(this.formData.nonTimepoint, this.rowConfig.key, { rawValue: val })
       this.$emit('change')
+    },
+    handleEnter: function () {
+      var table = this.$el && this.$el.closest('table')
+      if (!table) return
+      var inputs = Array.from(table.querySelectorAll('input:not([disabled])'))
+      var idx = inputs.indexOf(document.activeElement)
+      if (idx >= 0 && idx < inputs.length - 1) {
+        inputs[idx + 1].focus()
+      }
     }
   }
 }
@@ -182,11 +194,6 @@ export default {
 .stool-input.disabled {
   opacity: 0.4;
 }
-.stool-input::-webkit-inner-spin-button,
-.stool-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
 .stool-select {
   width: 72px;
   padding: 3px 4px;
@@ -206,7 +213,7 @@ export default {
 .stool-preview {
   font-size: 13px;
   font-weight: 600;
-  color: #409eff;
+  color: #1a73e8;
   letter-spacing: 0.5px;
   flex-shrink: 0;
 }

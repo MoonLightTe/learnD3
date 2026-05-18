@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-item">
+  <div class="custom-item" :class="{ 'out-of-range': isOutOfRange }">
     <input
       class="custom-label"
       :value="itemLabel"
@@ -9,7 +9,6 @@
     <input
       v-if="inputType !== 'select'"
       class="custom-value"
-      :class="{ 'out-of-range': isOutOfRange }"
       :value="itemValue"
       :placeholder="valuePlaceholder"
       @input="handleValueChange"
@@ -134,7 +133,7 @@ export default {
   color: #bbb;
   font-size: 12px;
 }
-.custom-value.out-of-range {
+.custom-item.out-of-range .custom-value {
   color: #d32f2f;
   background: #fef2f2;
 }

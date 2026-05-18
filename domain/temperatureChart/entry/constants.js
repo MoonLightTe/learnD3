@@ -11,12 +11,6 @@ export const TEMPERATURE_SPECIAL_TYPES = [
   { label: '拒测', collectionMode: null, value: '拒测' }
 ]
 
-export const TEMPERATURE_COOLING_TYPES = [
-  { label: '冰床降温', collectionMode: 5 },
-  { label: '冰敷', collectionMode: 6 },
-  { label: '冰帽', collectionMode: 7 }
-]
-
 export const COOLING_MEASURE_TYPES = [
   { label: '口温', collectionMode: 1 },
   { label: '腋温', collectionMode: 2 },

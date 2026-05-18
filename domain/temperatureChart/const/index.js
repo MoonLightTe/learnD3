@@ -52,9 +52,12 @@ export const TOP_KEYS = [
       if (surgeryDates.length === 0) return "";
       const { beginDate } = renderData.infoData;
       const currentDate = dayjs(beginDate).add(i, "day");
-      const parts = surgeryDates.map(function (surgDate) {
+      const romanNumerals = ["", "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ"];
+      const parts = surgeryDates.map(function (surgDate, idx) {
         const diff = currentDate.diff(dayjs(surgDate), "day");
-        if (diff <= 0) return "";
+        if (diff < 0) return "";
+        if (diff === 0 && idx > 0) return romanNumerals[idx + 1] || "Ⅱ";
+        if (diff === 0) return "";
         return String(diff);
       }).filter(Boolean);
       return parts.length > 0 ? parts.join("/") : "";
@@ -64,6 +67,7 @@ export const TOP_KEYS = [
 
 // 从数据中找到所有手术事件的日期
 function getSurgeryDates(renderData) {
+  if (renderData.surgeryDates) return renderData.surgeryDates;
   var dates = [];
   var rowsData = renderData.rowsData || [];
   rowsData.forEach(function (row) {

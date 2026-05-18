@@ -53,7 +53,7 @@
       </div>
 
       <!-- 右侧：批量录入表格 -->
-      <div class="batch-table-panel">
+      <div class="batch-table-panel" @keydown="handleKeyNav">
         <div v-if="selectedPatientIds.length === 0" class="empty-table">
           请在左侧勾选患者
         </div>
@@ -183,6 +183,8 @@ import UrineCell from './UrineCell.vue'
 import InputWithSelect from './cells/InputWithSelect.vue'
 import NpSimpleInput from './cells/NpSimpleInput.vue'
 import CustomItem from './cells/CustomItem.vue'
+
+import { handleTableKeyNav } from '../keyNav.js'
 
 var COMPONENT_MAP = {
   InlineTemperature: 'InlineTemperature',
@@ -339,6 +341,14 @@ export default {
 
     handleDataChange: function () {
       this.$emit('change')
+    },
+
+    // 方向键导航
+    handleKeyNav: function (e) {
+      handleTableKeyNav(e, {
+        container: this.$el.querySelector('.batch-table-panel'),
+        safeColMin: 5 // 跳过前5个固定列（操作/床号/姓名/住院日/术后天）
+      })
     },
 
     previewPatient: function (patient) {

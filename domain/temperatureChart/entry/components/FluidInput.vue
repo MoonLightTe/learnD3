@@ -3,18 +3,22 @@
     <div class="fluid-field">
       <input
         class="fluid-val"
+        inputmode="numeric"
         :value="value"
         placeholder="数值"
         @input="handleValueInput"
+        @keydown.enter="handleEnter"
       />
       <span class="fluid-unit">ml</span>
     </div>
     <div class="fluid-field">
       <input
         class="fluid-val"
+        inputmode="numeric"
         :value="hours"
         placeholder="小时"
         @input="handleHoursInput"
+        @keydown.enter="handleEnter"
       />
       <span class="fluid-unit">h</span>
     </div>
@@ -36,6 +40,15 @@ export default {
     handleHoursInput: function (e) {
       this.$emit('hours-change', e.target.value)
       this.$emit('change')
+    },
+    handleEnter: function () {
+      var table = this.$el && this.$el.closest('table')
+      if (!table) return
+      var inputs = Array.from(table.querySelectorAll('input:not([disabled])'))
+      var idx = inputs.indexOf(document.activeElement)
+      if (idx >= 0 && idx < inputs.length - 1) {
+        inputs[idx + 1].focus()
+      }
     }
   }
 }

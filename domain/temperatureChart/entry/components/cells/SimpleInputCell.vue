@@ -3,6 +3,7 @@
     <input
       ref="cellInput"
       class="cell-input"
+      inputmode="numeric"
       :value="value"
       :placeholder="rangeHint"
       @input="onInput"

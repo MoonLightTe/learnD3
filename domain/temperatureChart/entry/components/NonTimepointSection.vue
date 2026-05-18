@@ -160,6 +160,11 @@ export default {
   border: 1px solid #eee;
   padding: 6px 4px;
   vertical-align: middle;
+  transition: background 0.15s;
+}
+
+.np-table tbody td:hover {
+  background: #f0f4ff;
 }
 
 .row-label {

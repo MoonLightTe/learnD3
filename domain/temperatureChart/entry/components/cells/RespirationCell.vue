@@ -4,6 +4,7 @@
       <input
         ref="respInput"
         class="resp-input"
+        inputmode="numeric"
         :value="value"
         :placeholder="rangeHint"
         @input="onInput"

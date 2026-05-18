@@ -14,7 +14,16 @@
         </thead>
         <tbody>
           <tr v-if="events.length === 0">
-            <td colspan="6" class="empty-row">暂无事件记录</td>
+            <td colspan="6" class="empty-row">
+              <div class="empty-guide">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="opacity:0.3;margin-bottom:8px">
+                  <rect x="4" y="6" width="24" height="20" rx="3" stroke="#1a73e8" stroke-width="1.5" fill="none"/>
+                  <line x1="10" y1="13" x2="22" y2="13" stroke="#1a73e8" stroke-width="1.5" stroke-linecap="round"/>
+                  <line x1="10" y1="18" x2="18" y2="18" stroke="#1a73e8" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="empty-text">点击下方「添加新事件」记录入院、转科、手术等护理事件</span>
+              </div>
+            </td>
           </tr>
           <tr v-for="(row, index) in events" :key="index" :class="{ 'row-highlight': highlightIndex === index }">
             <td>
@@ -24,10 +33,9 @@
             <td class="cell-center">{{ row.eventTime }}</td>
             <td class="cell-center">{{ row.recordTime }}</td>
             <td class="cell-center">{{ row.recorder }}</td>
-            <td class="cell-center">
-              <button class="event-op-btn" title="编辑" @click="handleEdit(row, index)">
-                <i class="el-icon-edit"></i>
-              </button>
+            <td class="cell-center cell-ops">
+              <button class="event-text-btn edit" @click="handleEdit(row, index)">编辑</button>
+              <button class="event-text-btn delete" @click="handleDelete(index)">删除</button>
             </td>
           </tr>
         </tbody>
@@ -94,6 +102,17 @@ export default {
       this.editingIndex = index
       this.dialogVisible = true
     },
+    handleDelete: function (index) {
+      this.$confirm('确定删除该事件？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(function () {
+        this.events.splice(index, 1)
+        this.$emit('change')
+        this.$message.success('已删除')
+      }.bind(this)).catch(function () {})
+    },
     handleDialogConfirm: function (data) {
       if (this.editingIndex >= 0) {
         this.$set(this.events, this.editingIndex, Object.assign({}, data))
@@ -156,8 +175,19 @@ export default {
 
 .empty-row {
   text-align: center;
-  color: #c0c4cc;
   padding: 40px 0;
+}
+
+.empty-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #bbb;
+}
+
+.empty-text {
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .cell-content {
@@ -188,6 +218,27 @@ export default {
   border: none;
   background: none;
   &:hover { color: #1a73e8; background: #e8f0fe; }
+}
+
+.cell-ops {
+  white-space: nowrap;
+}
+
+.event-text-btn {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  &.edit {
+    color: #1a73e8;
+    &:hover { background: #e8f0fe; }
+  }
+  &.delete {
+    color: #999;
+    &:hover { color: #d32f2f; background: #fee; }
+  }
 }
 
 .event-footer {

@@ -10,7 +10,7 @@
   },
 
   "rows": [
-    { "key": "temperature", "label": "体温", "typeCode": "003", "unit": "℃", "component": "InlineTemperature", "alertRange": [34, 42] },
+    { "key": "temperature", "label": "体温", "typeCode": "003", "unit": "℃", "component": "InlineTemperature", "alertRange": [34, 38] },
     { "key": "pulse", "label": "脉搏", "typeCode": "002", "unit": "次/分", "component": "InputCell", "alertRange": [20, 250] },
     { "key": "heartRate", "label": "心率", "typeCode": "014", "unit": "次/分", "component": "InputCell", "alertRange": [20, 250] },
     { "key": "respiration", "label": "呼吸", "typeCode": "001", "unit": "次/分", "component": "RespirationCell", "alertRange": [5, 60] }
@@ -76,7 +76,7 @@
     { "type": "拒测", "color": "#E6A23C", "needTime": true },
     { "type": "请假", "color": "#E6A23C", "needTime": false },
     { "type": "查房", "color": "#409EFF", "needTime": true },
-    { "type": "手术", "color": "#F56C6C", "needTime": false },
+    { "type": "手术", "color": "#F56C6C", "needTime": true },
     { "type": "分娩", "color": "#F56C6C", "needTime": true },
     { "type": "出生", "color": "#409EFF", "needTime": true },
     { "type": "转科", "color": "#9B59B6", "needTime": true, "needTargetDept": true },

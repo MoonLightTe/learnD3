@@ -38,7 +38,7 @@ export default {
     isWarn() {
       var v = parseFloat(this.value)
       if (isNaN(v)) return false
-      var range = this.rowConfig.alertRange || [34, 42]
+      var range = this.rowConfig.alertRange || [34, 38]
       return v < range[0] || v > range[1]
     }
   },

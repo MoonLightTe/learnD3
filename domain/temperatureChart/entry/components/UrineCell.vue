@@ -10,6 +10,7 @@
       <span class="group-sep"></span>
       <input
         class="urine-input"
+        inputmode="numeric"
         :value="value"
         placeholder="尿量"
         :disabled="mark === '※'"

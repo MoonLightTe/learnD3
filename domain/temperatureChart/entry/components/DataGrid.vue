@@ -17,7 +17,10 @@
         <!-- 时间行 -->
         <tr>
           <th class="row-label-col" style="background:#fff;color:#666;font-weight:500">时间</th>
-          <th v-for="tp in timepoints" :key="'time-' + tp">{{ tp }}</th>
+          <th v-for="tp in timepoints" :key="'time-' + tp">
+            <span class="tp-dot" :class="isColumnEmpty(tp) ? 'empty' : 'filled'" :title="isColumnEmpty(tp) ? '未填写' : '已填写'"></span>
+            {{ tp }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -122,6 +125,11 @@ th, td {
   text-align: center;
   vertical-align: middle;
   position: relative;
+  transition: background 0.15s;
+}
+
+tbody td:hover {
+  background: #f0f4ff;
 }
 
 th {
@@ -163,5 +171,16 @@ th {
     cursor: not-allowed;
     &:hover { color: #e0e0e0; background: transparent; }
   }
+}
+
+.tp-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-right: 3px;
+  vertical-align: middle;
+  &.filled { background: #1a73e8; }
+  &.empty { background: transparent; border: 1px solid #ccc; }
 }
 </style>
